@@ -1,4 +1,4 @@
-# Autofill
+# Unique
 
 A REDCap external module providing action tags that make fields unique.
 
