@@ -1,0 +1,18 @@
+{
+  "name": "redcap-unique-actiontag",
+  "version": "1.0.0",
+  "description": "A REDCap external module providing action tags that make fields unique.",
+  "devDependencies": {
+    "@babel/cli": "^7.13.10",
+    "@babel/core": "^7.13.10",
+    "@babel/preset-env": "^7.13.12",
+    "babel-preset-minify": "^0.5.1"
+  },
+  "scripts": {
+    "build": "babel src -d lib --no-comments",
+    "dev": "babel src -d lib --source-maps inline --no-comments"
+  },
+  "keywords": ["redcap", "action tag"],
+  "author": "Ekin Tertemiz",
+  "license": "MIT"
+}

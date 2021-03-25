@@ -1,0 +1,43 @@
+{
+    "name": "Unique Action Tag",
+    "namespace": "STPH\\UniqueActionTag", 
+    "description": "A REDCap external module providing action tags that make fields unique.",
+    "authors": [
+        {
+             "name": "Ekin Tertemiz",
+             "email": "ekin.tertemiz@swisstph.ch",
+             "institution": "Swiss Tropical and Public Health Institute (STPH)"
+         }
+     ],
+     "framework-version": 3,
+     "permissions": [
+         "redcap_data_entry_form",
+         "redcap_every_page_top"
+     ],
+     "system-settings": [
+     ],
+     "project-settings": [
+         {
+             "key": "show-labels",
+             "name": "Show action tag information label on data entry pages",
+             "type": "checkbox"
+         },
+         {
+             "key": "javascript-debug",
+             "name": "Output debug information to the browser console",
+             "type": "checkbox"
+         },
+         {
+             "key": "show-errors",
+             "name": "Show autofill configuration errors on data entry pages",
+             "type": "checkbox"
+         }
+
+     ],
+     "compatibility": {
+         "php-version-min": "5.6.0",
+         "php-version-max": "",
+         "redcap-version-min": "10.1.0",
+         "redcap-version-max": ""
+      }
+ }
