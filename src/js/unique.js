@@ -91,6 +91,7 @@ STPH_UniqueAT.ActionTagClass = class {
 
     init() {
         this.writeLabels();
+        this.bindOnChange();
         this.bindOnBlur();
         this.ajaxCheckUnique('on-load');
     }
@@ -102,6 +103,60 @@ STPH_UniqueAT.ActionTagClass = class {
             label.html(label.text() + '<div style="font-weight:100;font-size:12px;">('+this.requestData.tag+')</div>')
         }
 
+    }
+
+    bindOnChange() {
+        //  Only for @UNIQUE-STRICT tags
+        if(this.requestData.tag == "@UNIQUE-STRICT") {
+            var obj = this.requestData.targets;
+            for (const prop in obj) {
+                if ( obj[prop] != this.requestData.field ) {
+                    //  obj[prop] != this.requestData.field
+                    $('input[name=' + obj[prop] + ']').bind('change', () => {
+                        this.onPageCheckUnique(obj[prop]);
+                    });
+                } else {
+                    $('input[name=' + obj[prop] + ']').bind('afterAjaxCheck', () => {
+                        console.log("After ajax done.");
+                        this.onPageCheckUnique(obj[prop]);
+                    });
+                }
+              }
+        }
+    }
+
+    onPageCheckUnique() {
+        if(this.requestData.value.length > 0 ) {            
+            this.toggleUI('start-load');
+            
+            var warnings = [];            
+            var filteredTargets = this.requestData.targets.filter((item) => {
+                return item !== this.requestData.field;
+            })
+
+            filteredTargets.forEach( (item) => { 
+                var itemObj = $('input[name='+item+']');
+                if( itemObj.val() == this.requestData.value ) {
+                    itemObj.css("background-color", "#FFB7BE");
+                    itemObj.css("font-weight", "bold");
+                    warnings.push(item);
+                } else {
+                    itemObj.css("background-color", "#FFFFFF");
+                    itemObj.css("font-weight", "normal");
+                }
+            })
+
+            if(warnings.length > 0){
+                this.toggleUI('show-warning', true, warnings);
+            } else {
+                this.toggleUI('remove-warning');
+            }
+            
+            this.toggleUI('stop-load');
+
+        } else {
+            this.toggleUI('remove-warning');
+        }
     }
 
     bindOnBlur() {
@@ -126,8 +181,9 @@ STPH_UniqueAT.ActionTagClass = class {
             )
             .done((response) => {
 
-                response != 0 ? this.toggleUI('show-duplicate', dialog) : this.toggleUI('remove-duplicate');            
+                response != 0 ? this.toggleUI('show-duplicate', dialog) : this.toggleUI('remove-duplicate');
                 this.toggleUI('stop-load');
+                $('input[name=' + this.requestData.field + ']').trigger("afterAjaxCheck");
             })
             .fail( (error) => {
                 STPH_UniqueAT.log(error);
@@ -140,7 +196,7 @@ STPH_UniqueAT.ActionTagClass = class {
         }
     }
 
-    toggleUI(phase, dialog = false){
+    toggleUI(phase, dialog = false, warnings = null){
         switch(phase) {
             case 'start-load':
                 this.ob.classList.add('loading-unique');
@@ -154,7 +210,8 @@ STPH_UniqueAT.ActionTagClass = class {
             
             case 'show-duplicate':                
                 STPH_UniqueAT.log('Detect duplicate for field ' + this.atv.field );
-
+                this.ob.style.fontWeight = 'bold';                
+                this.ob.style.backgroundColor = '#FFB7BE';
                 if(dialog){
                     simpleDialog(
                         'The current field is a unique field (@UNIQUE action tag)'+lang.data_entry_107+' '+lang.data_entry_109+' '+lang.data_entry_110+' ' + lang.data_entry_111+' (' + this.ob.value + ') '+lang.period+' '+lang.data_entry_108,
@@ -164,15 +221,28 @@ STPH_UniqueAT.ActionTagClass = class {
                         "$('#form :input[name="+this.atv.field+"]').focus();", 
                         lang.calendar_popup_01
                     );     
-                }
-
-                this.ob.style.fontWeight = 'bold';                
-                this.ob.style.backgroundColor = '#FFB7BE';                        
+                }                   
                 break;
-            
-            case 'remove-duplicate':
+
+            case 'show-warning':
+                STPH_UniqueAT.log('Warn of duplicate for field ' + this.atv.field );
+                this.ob.style.fontWeight = 'bold';        
+                this.ob.style.backgroundColor = '#FFB7BE';
+     
+                if(dialog){
+                    simpleDialog('Warning: You have entered a duplicate value in field(s) '+ warnings +'  in conflict to ' + this.atv.field);
+                }
+                break;
+
+            case 'remove-warning':
                 this.ob.style.fontWeight = 'normal';
                 this.ob.style.backgroundColor = '#FFFFFF';
+                break;
+            
+
+            case 'remove-duplicate':
+                this.ob.style.fontWeight = 'normal';
+                this.ob.style.backgroundColor = '#FFFFFF';                
                 break;
         }
     }
