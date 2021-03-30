@@ -26,13 +26,7 @@
              "key": "javascript-debug",
              "name": "Output debug information to the browser console",
              "type": "checkbox"
-         },
-         {
-             "key": "show-errors",
-             "name": "Show autofill configuration errors on data entry pages",
-             "type": "checkbox"
          }
-
      ],
      "compatibility": {
          "php-version-min": "5.6.0",

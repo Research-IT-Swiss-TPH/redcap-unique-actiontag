@@ -27,9 +27,13 @@ Makes the field unique.
 Usage:
 
 ```JS
-// without parameters; The field itself becomes unique.
+// without parameters; 
+// The field itself becomes unique.
 @UNIQUE
-// with parameters; The field itself becomes unique and also in relation to all listed field_names (field_1, field_2 and field_3)
+// with parameters; 
+// The field itself becomes unique and 
+// also in relation to all listed 
+// field_names (field_1, field_2 and field_3)
 @UNIQUE="field_1, field_2, field_3"
 ```
 
@@ -40,7 +44,10 @@ Makes the field unique also within the record itself.
 Usage:
 
 ```JS
-// Can only be used with parameters;  Checks for uniqueness of the current field value within and outside the record for given field_names (field_1, field_2).
+// Can only be used with parameters;  
+// Checks for uniqueness of the current 
+// field value within and outside the 
+// record for given field_names (field_1, field_2).
 @UNIQUE-STRICT="field_1, field_2"
 ```
 
@@ -58,3 +65,4 @@ Also ensure that you have Node.js running on your local development machine and 
 Version | Description
 ------- | --------------------
 v1.0.0  | Initial release.
+v1.1.0  | Added on page check for @UNIQUE-STRICT.
