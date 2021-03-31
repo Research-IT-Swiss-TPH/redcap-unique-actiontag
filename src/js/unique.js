@@ -92,8 +92,8 @@ STPH_UniqueAT.ActionTagClass = class {
 
     init() {
         this.writeLabels();
-        this.bindOnChange();
         this.bindOnBlur();
+        this.bindAfterAjax();
         this.ajaxCheckUnique('on-load');
     }
 
@@ -106,58 +106,109 @@ STPH_UniqueAT.ActionTagClass = class {
 
     }
 
-    bindOnChange() {
+    bindAfterAjax() {
         //  Only for @UNIQUE-STRICT tags
         if(this.requestData.tag == "@UNIQUE-STRICT") {
+            console.log("Add targets for field "+this.requestData.field)
+
             var obj = this.requestData.targets;
             for (const prop in obj) {
+                
                 if ( obj[prop] != this.requestData.field ) {
-                    //  obj[prop] != this.requestData.field
-                    $('input[name=' + obj[prop] + ']').bind('change', () => {
-                        this.onPageCheckUnique(obj[prop]);
-                    });
-                } else {
-                    $('input[name=' + obj[prop] + ']').bind('afterAjaxCheck', () => {
-                        console.log("After ajax done.");
-                        this.onPageCheckUnique(obj[prop]);
-                    });
+
+                    var targetsMaster =  $('input[name=' + this.requestData.field + ']').attr("data-targets");
+                    var targetsSlave = $('input[name=' + obj[prop] + ']').attr("data-targets");
+
+                    !targetsMaster ? targetsMaster = [] : targetsMaster = targetsMaster.split(",");
+                    !targetsSlave ? targetsSlave = [] : targetsSlave = targetsSlave.split(",");
+
+                    targetsMaster.push(obj[prop]);
+                    targetsSlave.push(this.requestData.field);
+
+                    $('input[name=' + this.requestData.field + ']').attr("data-targets", Array.from(new Set(targetsMaster)) );
+                    $('input[name=' + obj[prop] + ']').attr("data-targets", Array.from(new Set(targetsSlave)) );
+
+                    // $('input[name=' + obj[prop] + ']').bind('change', () => {
+                    //     this.onPageCheckOther( $('input[name=' + obj[prop] + ']') );
+                    // })
+
                 }
               }
+            
+            $('input[name=' + this.requestData.field + ']').bind('afterAjaxCheck', () => {
+                STPH_UniqueAT.log("After ajax done for field ."+ this.requestData.field);
+                this.onPageCheckUnique();
+            });
+        }
+    }
+
+    onPageCheckOther(ob) {
+        if(this.requestData.tag == "@UNIQUE-STRICT") {
+            ob.addClass('loading-unique');
+            var duplicateValues = [];            
+            var targets = ob.attr("data-targets").split(",");
+
+            targets.forEach( (target) => {
+                var targetValue = $('input[name=' + target + ']').val();
+                $('input[name=' + target + ']').removeClass("has-duplicate-warning")
+                if(targetValue == ob.val() && targetValue!= "" && ob.val != "") {
+                    duplicateValues.push(target);
+                }
+            })
+
+            if(duplicateValues.length > 0) {
+
+                simpleDialog('Warning: You have entered a duplicate value in field(s) '+ duplicateValues +'  in conflict to ' + ob.attr("name"));
+
+                $('input[name=' + ob.attr("name") + ']').addClass("has-duplicate-warning");              
+
+                duplicateValues.forEach((duplicate)=>{
+                    $('input[name=' + duplicate + ']').addClass("has-duplicate-warning");                    
+                });
+
+            } else {
+                $('input[name=' + ob.attr("name") + ']').removeClass("has-duplicate-warning");                                                  
+            }
+
+            ob.removeClass('loading-unique');
         }
     }
 
     onPageCheckUnique() {
-        if(this.requestData.value.length > 0 ) {            
-            this.toggleUI('start-load');
-            
-            var warnings = [];            
-            var filteredTargets = this.requestData.targets.filter((item) => {
-                return item !== this.requestData.field;
-            })
 
-            filteredTargets.forEach( (item) => { 
-                var itemObj = $('input[name='+item+']');
-                if( itemObj.val() == this.requestData.value ) {
-                    itemObj.css("background-color", "#FFB7BE");
-                    itemObj.css("font-weight", "bold");
-                    warnings.push(item);
+            if(this.requestData.tag == "@UNIQUE-STRICT") {
+                console.log("trigger check on page")
+                this.toggleUI('start-load');
+                
+                var duplicateValues = [];            
+    
+                var targets = this.ob.dataset.targets.split(",");
+    
+                targets.forEach( (target) => {
+                    var targetValue = $('input[name=' + target + ']').val();
+                    $('input[name=' + target + ']').removeClass("has-duplicate-warning")
+                    if(targetValue == this.requestData.value && targetValue!= "" && this.requestData.value != "") {
+                        duplicateValues.push(target);
+                    }
+                })
+    
+                if(duplicateValues.length > 0) {
+                    this.toggleUI('show-warning', true, duplicateValues);
+                    $('input[name=' + this.requestData.field + ']').addClass("has-duplicate-warning");              
+    
+                    duplicateValues.forEach((duplicate)=>{
+                        $('input[name=' + duplicate + ']').addClass("has-duplicate-warning");                    
+                    });
+    
                 } else {
-                    itemObj.css("background-color", "#FFFFFF");
-                    itemObj.css("font-weight", "normal");
+                    $('input[name=' + this.requestData.field + ']').removeClass("has-duplicate-warning");                                                  
                 }
-            })
-
-            if(warnings.length > 0){
-                this.toggleUI('show-warning', true, warnings);
-            } else {
-                this.toggleUI('remove-warning');
+    
+                console.log(duplicateValues);
+                
+                this.toggleUI('stop-load');
             }
-            
-            this.toggleUI('stop-load');
 
-        } else {
-            this.toggleUI('remove-warning');
-        }
     }
 
     bindOnBlur() {
@@ -169,6 +220,7 @@ STPH_UniqueAT.ActionTagClass = class {
 
     ajaxCheckUnique(trigger) {
         var dialog = trigger == 'on-blur' ? true : false;
+        var onLoad = trigger == 'on-load' ? true : false;
         this.requestData.value = trim(this.ob.value);
 
         if(this.requestData.value.length > 0 ) {
@@ -186,7 +238,10 @@ STPH_UniqueAT.ActionTagClass = class {
                     this.toggleUI('show-duplicate', dialog)
                 } else {
                     this.toggleUI('remove-duplicate');
-                    $('input[name=' + this.requestData.field + ']').trigger("afterAjaxCheck");
+
+                    if(!onLoad) {
+                        $('input[name=' + this.requestData.field + ']').trigger("afterAjaxCheck");
+                    }
                 }
                 this.toggleUI('stop-load');
             })
@@ -198,10 +253,11 @@ STPH_UniqueAT.ActionTagClass = class {
         }
         else {
             this.toggleUI('remove-duplicate');
+            this.onPageCheckUnique();
         }
     }
 
-    toggleUI(phase, dialog = false, warnings = null){
+    toggleUI(phase, dialog = false, duplicates = null){
         switch(phase) {
             case 'start-load':
                 this.ob.classList.add('loading-unique');
@@ -219,29 +275,24 @@ STPH_UniqueAT.ActionTagClass = class {
                 this.ob.style.backgroundColor = '#FFB7BE';
                 if(dialog){
                     simpleDialog(
-                        'The current field is a unique field (@UNIQUE action tag)'+lang.data_entry_107+' '+lang.data_entry_109+' '+lang.data_entry_110+' ' + lang.data_entry_111+' (' + this.ob.value + ') '+lang.period+' '+lang.data_entry_108,
+                        'The field '+ this.atv.field +' is a unique field ('+this.requestData.tag+')'+lang.data_entry_107+' '+lang.data_entry_109+' '+lang.data_entry_110+' ' + lang.data_entry_111+' (' + this.ob.value + ') '+lang.period+' '+lang.data_entry_108,
                         lang.data_entry_105, 
                         'suf_warning_dialog', 
                         500,
-                        "$('#form :input[name="+this.atv.field+"]').focus();", 
+                        //"$('#form :input[name="+this.atv.field+"]').focus();", 
                         lang.calendar_popup_01
                     );     
                 }                   
                 break;
 
             case 'show-warning':
-                STPH_UniqueAT.log('Warn of duplicate for field ' + this.atv.field );
-                this.ob.style.fontWeight = 'bold';        
-                this.ob.style.backgroundColor = '#FFB7BE';
-     
+                STPH_UniqueAT.log('Warn of duplicate for field ' + this.atv.field );     
                 if(dialog){
-                    simpleDialog('Warning: You have entered a duplicate value in field(s) '+ warnings +'  in conflict to ' + this.atv.field);
+                    simpleDialog('Warning: You have entered a duplicate value in field(s) '+ duplicates +'  in conflict to ' + this.atv.field);
                 }
                 break;
 
             case 'remove-warning':
-                this.ob.style.fontWeight = 'normal';
-                this.ob.style.backgroundColor = '#FFFFFF';
                 break;
             
 
