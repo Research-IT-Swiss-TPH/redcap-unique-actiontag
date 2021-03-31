@@ -61,7 +61,8 @@ STPH_UniqueAT.init = function() {
             if(fieldInfo.type == "text") {
                 for (var i = 0; i < fieldInfo.tagPerFieldCount; i++) {
                     if (fieldInfo[i]) {
-                        new STPH_UniqueAT.ActionTagClass(fieldInfo[i], fieldInfo.tag).init();  
+                        fieldInfo[i]["tag"] = fieldInfo.tag;
+                        new STPH_UniqueAT.ActionTagClass(fieldInfo[i]).init();  
                     }
                 }
             }
@@ -72,13 +73,13 @@ STPH_UniqueAT.init = function() {
 
 STPH_UniqueAT.ActionTagClass = class {
 
-    constructor(actionTagValue, actionTagLiteral) {
+    constructor(actionTagValue) {
         this.atv = actionTagValue;
         this.ob = document.getElementsByName(this.atv.field)[0];
         this.request = STPH_UniqueAT.request,
         this.requestUrl =  STPH_UniqueAT.request.url,
         this.requestData = {
-            tag: actionTagLiteral,
+            tag: this.atv.tag,
             value: null,
             field: this.atv.field,
             targets: this.atv.targets,
