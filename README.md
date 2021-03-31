@@ -66,3 +66,4 @@ Version | Description
 ------- | --------------------
 v1.0.0  | Initial release.
 v1.1.0  | Added on page check for @UNIQUE-STRICT.
+v1.1.1  | Minor bug fixes.
