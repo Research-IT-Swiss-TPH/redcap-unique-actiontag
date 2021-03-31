@@ -217,9 +217,13 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         // Add active fields to action tags array with tag keys in camelCase
         foreach ($this->actionTags as $actionTag) {
             
-            $camelCase = str_replace('-', '', ucwords(strtolower(ltrim($actionTag, '@')), '-'));
-            $camelCase[0] = strtolower($camelCase[0]);
-            $actionTags[$camelCase] = $active_fields[$actionTag];
+            //  Only insert active action tags
+            if(isset($active_fields[$actionTag])) {
+                $camelCase = str_replace('-', '', ucwords(strtolower(ltrim($actionTag, '@')), '-'));
+                $camelCase[0] = strtolower($camelCase[0]);
+                $actionTags[$camelCase] = $active_fields[$actionTag];
+            }
+
         }
 
         // Prepare parameter array to be passed to Javascript
