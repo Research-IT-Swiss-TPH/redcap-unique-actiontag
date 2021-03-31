@@ -119,7 +119,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                                     //  Add field always to the list itself
                                     array_unshift($param_array , $field);
                                     //  Remove duplicate fields, trim spaces and explode into array
-                                    $param_final = array_unique($param_array);
+                                    $param_final = array_values(array_unique($param_array));
                                     $param = array (
                                         "targets" => $param_final                          
                                     );
@@ -254,7 +254,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         );
         //  Include Babel compiled Javascript file (`npm run build`) and initialize module script with parameters
         ?>
-            <script src="<?php print $this->getUrl('lib/js/unique.js'); ?>"></script>
+            <script src="<?php print $this->getUrl('src/js/unique.js'); ?>"></script>
             <script>
                 STPH_UniqueAT.request = <?php print json_encode($request) ?>;
                 STPH_UniqueAT.params = <?= json_encode($params) ?>;                
