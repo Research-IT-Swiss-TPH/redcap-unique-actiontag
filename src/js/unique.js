@@ -181,9 +181,13 @@ STPH_UniqueAT.ActionTagClass = class {
             )
             .done((response) => {
 
-                response != 0 ? this.toggleUI('show-duplicate', dialog) : this.toggleUI('remove-duplicate');
+                if(response != 0) {
+                    this.toggleUI('show-duplicate', dialog)
+                } else {
+                    this.toggleUI('remove-duplicate');
+                    $('input[name=' + this.requestData.field + ']').trigger("afterAjaxCheck");
+                }
                 this.toggleUI('stop-load');
-                $('input[name=' + this.requestData.field + ']').trigger("afterAjaxCheck");
             })
             .fail( (error) => {
                 STPH_UniqueAT.log(error);
