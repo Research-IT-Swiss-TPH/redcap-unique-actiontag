@@ -143,7 +143,7 @@ STPH_UniqueAT.ActionTagClass = class {
               }
             
             $('input[name=' + this.requestData.field + ']').bind('afterAjaxCheck', () => {
-                STPH_UniqueAT.log("After ajax done for field ."+ this.requestData.field);
+                STPH_UniqueAT.log("After ajax done for field "+ this.requestData.field);
                 this.onPageCheckUnique();
             });
         }
@@ -184,7 +184,7 @@ STPH_UniqueAT.ActionTagClass = class {
     onPageCheckUnique() {
 
             if(this.requestData.tag == "@UNIQUE-STRICT") {
-                console.log("trigger check on page")
+                console.log("trigger check on page with value " + this.requestData.value);
                 this.toggleUI('start-load');
                 
                 var duplicateValues = [];            
@@ -211,7 +211,7 @@ STPH_UniqueAT.ActionTagClass = class {
                     $('input[name=' + this.requestData.field + ']').removeClass("has-duplicate-warning");                                                  
                 }
     
-                console.log(duplicateValues);
+                //console.log(duplicateValues);
                 
                 this.toggleUI('stop-load');
             }
@@ -250,6 +250,7 @@ STPH_UniqueAT.ActionTagClass = class {
                         $('input[name=' + this.requestData.field + ']').trigger("afterAjaxCheck");
                     }
                 }
+
                 this.toggleUI('stop-load');
             })
             .fail( (error) => {
@@ -284,10 +285,7 @@ STPH_UniqueAT.ActionTagClass = class {
                     simpleDialog(
                         'The field '+ this.atv.field +' is a unique field ('+this.requestData.tag+')'+lang.data_entry_107+' '+lang.data_entry_109+' '+lang.data_entry_110+' ' + lang.data_entry_111+' (' + this.ob.value + ') '+lang.period+' '+lang.data_entry_108,
                         lang.data_entry_105, 
-                        'suf_warning_dialog', 
-                        500,
-                        //"$('#form :input[name="+this.atv.field+"]').focus();", 
-                        lang.calendar_popup_01
+                        'suf_warning_dialog'
                     );     
                 }                   
                 break;
