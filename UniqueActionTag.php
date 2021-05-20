@@ -206,6 +206,12 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         $show_errors = $this->getProjectSetting("show-errors") == true;
         $show_labels = $this->getProjectSetting("show-labels") == true;
 
+        //  Gather strict-unique exceptions to be passed to Javascript
+        $exceptions = array();
+        $exceptions_str = $this->getProjectSetting("exceptions");
+        if(!empty($exceptions_str)) {
+            $exceptions = array_map('trim', explode(',', $exceptions_str ));
+        }
 
         // Augment unqiue fields with some metadata (field type, ...)
         foreach ($active_fields as $tag => &$field_info) {
@@ -237,6 +243,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             "errors" => $show_errors,
             "labels" => $show_labels,
             "survey" => $is_survey,
+            "exceptions" => $exceptions,
             "actionTags" => $actionTags ?: array()
         );
 
@@ -295,7 +302,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
      */
     public function handleActionTag($data) {  
 
-        try {
+        try {          
 
             $project_id = db_escape($data["pid"]);
             $record = db_escape($data["record"]);
@@ -303,7 +310,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             $field = db_escape($data["field"]);
             $targets = implode("','",$data["targets"]);
             $tag = db_escape($data["tag"]);
-
+           
             if($tag == $this->atUnique) {
 
                 // Get a count of all duplicated values for the $secondary_pk field (exclude submitted record name when counting)
@@ -314,6 +321,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                 print db_result($q, 0);
 
             }
+
             if($tag == $this->atUniqueStrict) {
 
                 $event_id = $data["event_id"];

@@ -26,6 +26,11 @@
              "key": "javascript-debug",
              "name": "Output debug information to the browser console",
              "type": "checkbox"
+         },
+         {
+            "key": "exceptions",
+            "name": "Comma separated list of exceptions (for unique-strict only)",
+            "type": "text"
          }
      ],
      "compatibility": {

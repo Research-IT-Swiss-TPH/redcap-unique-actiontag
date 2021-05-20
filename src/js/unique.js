@@ -187,7 +187,8 @@ STPH_UniqueAT.ActionTagClass = class {
                 console.log("trigger check on page with value " + this.requestData.value);
                 this.toggleUI('start-load');
                 
-                var duplicateValues = [];            
+                var duplicateValues = [];         
+                var isException =  STPH_UniqueAT.params.exceptions.includes(this.requestData.value);
     
                 var targets = this.ob.dataset.targets.split(",");
     
@@ -199,7 +200,7 @@ STPH_UniqueAT.ActionTagClass = class {
                     }
                 })
     
-                if(duplicateValues.length > 0) {
+                if(duplicateValues.length > 0 && !isException) {
                     this.toggleUI('show-warning', true, duplicateValues);
                     $('input[name=' + this.requestData.field + ']').addClass("has-duplicate-warning");              
     
