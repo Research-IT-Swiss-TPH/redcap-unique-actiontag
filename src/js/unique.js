@@ -92,15 +92,22 @@ STPH_UniqueAT.ActionTagClass = class {
 
     init() {
         this.writeLabels();
-        this.bindOnBlur();
-        this.bindAfterAjax();
-        this.ajaxCheckUnique('on-load');
+        if( this.atv.error ) {
+            STPH_UniqueAT.log('Error: ['+ this.requestData.tag +'][' + this.atv.field + ']' + this.atv.error + '.)');
+        } else {
+            this.bindOnBlur();
+            this.bindAfterAjax();
+            this.ajaxCheckUnique('on-load');
+        }
     }
 
     writeLabels() {
         if (STPH_UniqueAT.params.labels) {
             STPH_UniqueAT.log('['+ this.requestData.tag +'][' + this.atv.field + '] Apply actiontag with target(s): ' + this.atv.targets + '.)');
             var label = $('#label-'+this.atv.field+' tr').find("td:first");
+            if(this.error) {
+
+            }
             label.html(label.text() + '<div style="font-weight:100;font-size:12px;">('+this.requestData.tag+')</div>')
         }
 

@@ -91,7 +91,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                     if ($param === NULL) {
                         $param = array(
                             "error" => "Invalid parameters",
-                            "target" => ""
+                            "target" => null
                         );
                     }
                     if($param == "") {
@@ -104,31 +104,36 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                                 );
                                 break;
                             case $this->atUniqueStrict:
-                                //  Skip this because not relevant
+                                //  Skip this because not relevant                              
                                 break;
                         }
 
                     }
-                    else {
+                    else {                       
                         // Convert non-json parameters to corresponding array
                         if (!is_array($param)) {
                             switch($tag) {
                                 case $this->atUniqueStrict:
                                 case $this->atUnique:
+                                    $error = $param;
+                                    if(empty($param)){
+                                        $error = "Invalid parameter string.";
+                                        break;
+                                    }
                                     $param_array = array_map('trim', explode(',', $param));
                                     //  Add field always to the list itself
                                     array_unshift($param_array , $field);
                                     //  Remove duplicate fields, trim spaces and explode into array
                                     $param_final = array_values(array_unique($param_array));
                                     $param = array (
-                                        "targets" => $param_final                          
+                                        "targets" => $param_final
                                     );
                                     break;
                             }
                         }
                         // Complete parameters with defaults
                         $param["field"] = $field;
-                        $param["error"] = "";
+                        //$param["error"] = $error;
 
                     }
                     $params[] = $param;

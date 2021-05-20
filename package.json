@@ -12,7 +12,10 @@
     "build": "babel src -d lib --no-comments",
     "dev": "babel src -d lib --source-maps inline --no-comments"
   },
-  "keywords": ["redcap", "action tag"],
+  "keywords": [
+    "redcap",
+    "action tag"
+  ],
   "author": "Ekin Tertemiz",
   "license": "MIT"
 }
