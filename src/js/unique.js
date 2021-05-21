@@ -105,9 +105,6 @@ STPH_UniqueAT.ActionTagClass = class {
         if (STPH_UniqueAT.params.labels) {
             STPH_UniqueAT.log('['+ this.requestData.tag +'][' + this.atv.field + '] Apply actiontag with target(s): ' + this.atv.targets + '.)');
             var label = $('#label-'+this.atv.field+' tr').find("td:first");
-            if(this.error) {
-
-            }
             label.html(label.text() + '<div style="font-weight:100;font-size:12px;">('+this.requestData.tag+')</div>')
         }
 
@@ -116,7 +113,7 @@ STPH_UniqueAT.ActionTagClass = class {
     bindAfterAjax() {
         //  Only for @UNIQUE-STRICT tags
         if(this.requestData.tag == "@UNIQUE-STRICT") {
-            console.log("Add targets for field "+this.requestData.field)
+            STPH_UniqueAT.log("Add targets for field "+this.requestData.field)
 
             var obj = this.requestData.targets;
             for (const prop in obj) {
@@ -135,10 +132,6 @@ STPH_UniqueAT.ActionTagClass = class {
                     $('input[name=' + this.requestData.field + ']').attr("data-targets", Array.from(new Set(targetsMaster)) );
                     $('input[name=' + obj[prop] + ']').attr("data-targets", Array.from(new Set(targetsSlave)) );
 
-                    // $('input[name=' + obj[prop] + ']').bind('change', () => {
-                    //     this.onPageCheckOther( $('input[name=' + obj[prop] + ']') );
-                    // })
-
                 }
               }
             
@@ -149,47 +142,15 @@ STPH_UniqueAT.ActionTagClass = class {
         }
     }
 
-    onPageCheckOther(ob) {
-        if(this.requestData.tag == "@UNIQUE-STRICT") {
-            ob.addClass('loading-unique');
-            var duplicateValues = [];            
-            var targets = ob.attr("data-targets").split(",");
-
-            targets.forEach( (target) => {
-                var targetValue = $('input[name=' + target + ']').val();
-                $('input[name=' + target + ']').removeClass("has-duplicate-warning")
-                if(targetValue == ob.val() && targetValue!= "" && ob.val != "") {
-                    duplicateValues.push(target);
-                }
-            })
-
-            if(duplicateValues.length > 0) {
-
-                simpleDialog('Warning: You have entered a duplicate value in field(s) '+ duplicateValues +'  in conflict to ' + ob.attr("name"));
-
-                $('input[name=' + ob.attr("name") + ']').addClass("has-duplicate-warning");              
-
-                duplicateValues.forEach((duplicate)=>{
-                    $('input[name=' + duplicate + ']').addClass("has-duplicate-warning");                    
-                });
-
-            } else {
-                $('input[name=' + ob.attr("name") + ']').removeClass("has-duplicate-warning");                                                  
-            }
-
-            ob.removeClass('loading-unique');
-        }
-    }
-
+    //  Check Uniqueness on the same page - called conditionally after per request check: ajaxCheckUnique
     onPageCheckUnique() {
 
             if(this.requestData.tag == "@UNIQUE-STRICT") {
                 console.log("trigger check on page with value " + this.requestData.value);
                 this.toggleUI('start-load');
                 
-                var duplicateValues = [];         
-                var isException =  STPH_UniqueAT.params.exceptions.includes(this.requestData.value);
-    
+                var duplicateValues = [];
+                
                 var targets = this.ob.dataset.targets.split(",");
     
                 targets.forEach( (target) => {
@@ -199,6 +160,9 @@ STPH_UniqueAT.ActionTagClass = class {
                         duplicateValues.push(target);
                     }
                 })
+    
+                //  Check if value is an exception
+                var isException =  STPH_UniqueAT.params.exceptions.includes(this.requestData.value);
     
                 if(duplicateValues.length > 0 && !isException) {
                     this.toggleUI('show-warning', true, duplicateValues);
@@ -226,12 +190,16 @@ STPH_UniqueAT.ActionTagClass = class {
         });
     }
 
+    //  Check Uniqueness per event trigger - on blur or on load
     ajaxCheckUnique(trigger) {
         var dialog = trigger == 'on-blur' ? true : false;
         var onLoad = trigger == 'on-load' ? true : false;
         this.requestData.value = trim(this.ob.value);
 
-        if(this.requestData.value.length > 0 ) {
+        //  Check if value is an exception
+        var isException =  STPH_UniqueAT.params.exceptions.includes(this.requestData.value);
+
+        if(this.requestData.value.length > 0 && !isException) {
             this.toggleUI('start-load');
 
             $.post( 
@@ -266,6 +234,7 @@ STPH_UniqueAT.ActionTagClass = class {
         }
     }
 
+    //  UI manipulation helper function with different cases
     toggleUI(phase, dialog = false, duplicates = null){
         switch(phase) {
             case 'start-load':

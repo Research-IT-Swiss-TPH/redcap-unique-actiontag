@@ -16,6 +16,7 @@ Automatic installation:
 
 - Labels indicating action tag information can be shown on the data entry form fields.
 - Debug information can be output to the browser's console by enabling the JavaScript Debug option.
+- Add exceptions for default values that will not be checked for uniqueness (currently only working for unique-strict)
 
 
 ## Action Tags
@@ -68,3 +69,4 @@ v1.0.0  | Initial release.
 v1.1.0  | Added on page check for @UNIQUE-STRICT.
 v1.1.1  | Minor bug fixes.
 v1.2.0  | Improve error handling. Add exceptions for unique-strict.
+v1.2.1  | Cover all exception cases. Code cleanup and improvement.
