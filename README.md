@@ -70,3 +70,4 @@ v1.1.0  | Added on page check for @UNIQUE-STRICT.
 v1.1.1  | Minor bug fixes.
 v1.2.0  | Improve error handling. Add exceptions for unique-strict.
 v1.2.1  | Cover all exception cases. Code cleanup and improvement.
+v1.2.1  | Adjust dialogs, add internationlization for German.
