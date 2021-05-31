@@ -20,7 +20,7 @@ class Project
 
     function __construct($framework, $project_id){
         $this->framework = $framework;
-        $this->project_id = $framework->requireInteger($project_id * 1);        
+        $this->project_id = $framework->requireInteger($project_id * 1);
 
     }
 

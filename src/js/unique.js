@@ -151,8 +151,8 @@ STPH_UniqueAT.ActionTagClass = class {
                 
                 var duplicateValues = [];
                 
+                //  Cleanup all targets before checking
                 var targets = this.ob.dataset.targets.split(",");
-    
                 targets.forEach( (target) => {
                     var targetValue = $('input[name=' + target + ']').val();
                     $('input[name=' + target + ']').removeClass("has-duplicate-warning")
@@ -175,9 +175,7 @@ STPH_UniqueAT.ActionTagClass = class {
                 } else {
                     $('input[name=' + this.requestData.field + ']').removeClass("has-duplicate-warning");                                                  
                 }
-    
-                //console.log(duplicateValues);
-                
+                   
                 this.toggleUI('stop-load');
             }
 
@@ -253,7 +251,7 @@ STPH_UniqueAT.ActionTagClass = class {
                 this.ob.style.backgroundColor = '#FFB7BE';
                 if(dialog){
                     simpleDialog(
-                        'The field '+ this.atv.field +' is a unique field ('+this.requestData.tag+')'+lang.data_entry_107+' '+lang.data_entry_109+' '+lang.data_entry_110+' ' + lang.data_entry_111+' (' + this.ob.value + ') '+lang.period+' '+lang.data_entry_108,
+                        STPH_UniqueAT.lang.dialog_1 + ' "'+this.atv.field + '" ' + STPH_UniqueAT.lang.dialog_1_5 + '('+this.requestData.tag+')'+STPH_UniqueAT.lang.dialog_2+' ("' + this.ob.value + '") '+lang.period+' '+STPH_UniqueAT.lang.dialog_3,
                         lang.data_entry_105, 
                         'suf_warning_dialog'
                     );     
@@ -263,7 +261,7 @@ STPH_UniqueAT.ActionTagClass = class {
             case 'show-warning':
                 STPH_UniqueAT.log('Warn of duplicate for field ' + this.atv.field );     
                 if(dialog){
-                    simpleDialog('Warning: You have entered a duplicate value in field(s) '+ duplicates +'  in conflict to ' + this.atv.field);
+                    simpleDialog( STPH_UniqueAT.lang.dialog_4 + ' ' + duplicates +' ' +  STPH_UniqueAT.lang.dialog_5 + ' ' + this.atv.field);
                 }
                 break;
 

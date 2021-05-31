@@ -256,6 +256,15 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
      */
     private function renderJavascript($params) {
 
+        $lang = array(
+            "dialog_1" => $this->tt("u_dialog_1"),
+            "dialog_1_5" => $this->tt("u_dialog_1_5"),
+            "dialog_2" => $this->tt("u_dialog_2"),            
+            "dialog_3" => $this->tt("u_dialog_3"),
+            "dialog_4" => $this->tt("w_dialog_1"),
+            "dialog_5" => $this->tt("w_dialog_2"),
+        );
+
         // Define request parameters
         $request = array(
             "url" => $this->getUrl("requestHandler.php"),
@@ -269,7 +278,8 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             <script src="<?php print $this->getUrl('lib/js/unique.js'); ?>"></script>
             <script>
                 STPH_UniqueAT.request = <?php print json_encode($request) ?>;
-                STPH_UniqueAT.params = <?= json_encode($params) ?>;                
+                STPH_UniqueAT.params = <?= json_encode($params) ?>;
+                STPH_UniqueAT.lang = <?php print json_encode($lang) ?>;
                 $(function() {
                     $(document).ready(function(){
                         STPH_UniqueAT.init();

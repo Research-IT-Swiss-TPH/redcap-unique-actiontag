@@ -57,7 +57,7 @@ Usage:
 **Feature and pull requests** are welcome!
 
 The module is using a Babel compiler to ensure modern Javascript can be used without losing Browser Support. 
-Run `npm run build` or `npm run dev` after making code changes to your Javacsript.
+Run `npm run build` or `npm run dev` after making code changes to your Javascript.
 Also ensure that you have Node.js running on your local development machine and have installed all necessary local dependencies with `npm install`.
 
 
