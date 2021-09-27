@@ -31,6 +31,11 @@
             "key": "exceptions",
             "name": "Comma separated list of exceptions (for unique-strict only)",
             "type": "text"
+         },
+         {
+             "key": "enable-hard-check",
+             "name": "Enable Hard Check<br>Disable Save Buttons if there are non-unique fields within a record.",
+             "type": "checkbox"
          }
      ],
      "compatibility": {

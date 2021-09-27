@@ -8,3 +8,8 @@
     background-color: #ffeaa7!important;
     font-weight: bold!important;
 }
+
+.has-duplicate-error {
+    background-color: #FFB7BE!important;
+    font-weight: bold!important;
+}

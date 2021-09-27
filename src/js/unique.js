@@ -146,7 +146,7 @@ STPH_UniqueAT.ActionTagClass = class {
     onPageCheckUnique() {
 
             if(this.requestData.tag == "@UNIQUE-STRICT") {
-                console.log("trigger check on page with value " + this.requestData.value);
+                STPH_UniqueAT.log("trigger check on page with value " + this.requestData.value);
                 this.toggleUI('start-load');
                 
                 var duplicateValues = [];
@@ -176,7 +176,7 @@ STPH_UniqueAT.ActionTagClass = class {
                     $('input[name=' + this.requestData.field + ']').removeClass("has-duplicate-warning");                                                  
                 }
                    
-                this.toggleUI('stop-load');
+                this.finalizeCheck();
             }
 
     }
@@ -199,6 +199,7 @@ STPH_UniqueAT.ActionTagClass = class {
 
         if(this.requestData.value.length > 0 && !isException) {
             this.toggleUI('start-load');
+            this.toggleUI('hide-save-buttons');
 
             $.post( 
                 this.requestUrl, 
@@ -217,13 +218,13 @@ STPH_UniqueAT.ActionTagClass = class {
                         $('input[name=' + this.requestData.field + ']').trigger("afterAjaxCheck");
                     }
                 }
-
-                this.toggleUI('stop-load');
             })
             .fail( (error) => {
                 STPH_UniqueAT.log(error);
                 alert(woops);
-                this.toggleUI('stop-load');
+            })
+            .always( () => {
+                this.finalizeCheck();
             });
         }
         else {
@@ -232,29 +233,72 @@ STPH_UniqueAT.ActionTagClass = class {
         }
     }
 
+    finalizeCheck() {
+        this.toggleUI('stop-load');
+
+        if(STPH_UniqueAT.params.hard_check) {
+            this.evaluateSaveState();
+        } else {
+            this.toggleUI('show-save-buttons');
+        }
+        
+    }
+
+    evaluateSaveState(){
+        STPH_UniqueAT.log("Evaluating Save State");
+        var duplicates = $('.has-duplicate-error, .has-duplicate-warning');
+        if(duplicates.length > 0) {
+            this.toggleUI('hide-save-buttons');
+        } else {
+            this.toggleUI('show-save-buttons');
+        }
+    }
+
+    
     //  UI manipulation helper function with different cases
     toggleUI(phase, dialog = false, duplicates = null){
         switch(phase) {
             case 'start-load':
+                STPH_UniqueAT.log('Start loading ' + this.atv.field );
                 this.ob.classList.add('loading-unique');
-                $('#formSaveTip button, #form :input[name="'+ this.atv.field +'"], #form button').prop("disabled", true);
-                break;
-                
+                $('#form :input[name="'+ this.atv.field +'"]').prop("disabled", true);
+                break;                
+
             case 'stop-load': 
+                STPH_UniqueAT.log('Stop loading ' + this.atv.field );
                 this.ob.classList.remove('loading-unique');
-                $('#formSaveTip button, #form :input[name="'+ this.atv.field+'"], #form button').prop("disabled", false);
+                $('#form :input[name="'+ this.atv.field+'"]').prop("disabled", false);
+
+                break;
+
+            case 'show-save-buttons':
+                $('#formSaveTip button, #form button').prop("disabled", false);
+                break;
+
+            case 'hide-save-buttons':
+                $('#formSaveTip button, #form button').prop("disabled", true);
                 break;
             
             case 'show-duplicate':                
                 STPH_UniqueAT.log('Detect duplicate for field ' + this.atv.field );
-                this.ob.style.fontWeight = 'bold';                
-                this.ob.style.backgroundColor = '#FFB7BE';
+                this.ob.classList.add("has-duplicate-error");
+                
                 if(dialog){
+
+                    var optional = "";
+                
+                    if(this.requestData.tag == "@UNIQUE-STRICT") {
+                        var targets = this.requestData.targets;
+                        var current = this.requestData.field;
+                        var filteredTargets = targets.filter(function(e) { return e !== current });
+                        optional = STPH_UniqueAT.lang.dialog_2_5 + filteredTargets.join();
+                    } 
+
                     simpleDialog(
-                        STPH_UniqueAT.lang.dialog_1 + ' "'+this.atv.field + '" ' + STPH_UniqueAT.lang.dialog_1_5 + '('+this.requestData.tag+')'+STPH_UniqueAT.lang.dialog_2+' ("' + this.ob.value + '") '+lang.period+' '+STPH_UniqueAT.lang.dialog_3,
-                        lang.data_entry_105, 
+                        STPH_UniqueAT.lang.dialog_1 + ' "'+this.atv.field + '" ' + STPH_UniqueAT.lang.dialog_1_5 + STPH_UniqueAT.lang.dialog_2+' ("' + this.ob.value + '") '+ optional + lang.period+' '+STPH_UniqueAT.lang.dialog_3,
+                        lang.data_entry_105 + " " + this.requestData.tag, 
                         'suf_warning_dialog'
-                    );     
+                    );
                 }                   
                 break;
 
@@ -270,8 +314,7 @@ STPH_UniqueAT.ActionTagClass = class {
             
 
             case 'remove-duplicate':
-                this.ob.style.fontWeight = 'normal';
-                this.ob.style.backgroundColor = '#FFFFFF';                
+                this.ob.classList.remove("has-duplicate-error");           
                 break;
         }
     }

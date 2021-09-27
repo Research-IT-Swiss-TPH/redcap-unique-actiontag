@@ -205,6 +205,8 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         $debug = $this->getProjectSetting("javascript-debug") == true;
         $show_errors = $this->getProjectSetting("show-errors") == true;
         $show_labels = $this->getProjectSetting("show-labels") == true;
+        $enable_hard_check = $this->getProjectSetting("enable-hard-check") == true;
+
 
         //  Gather strict-unique exceptions to be passed to Javascript
         $exceptions = array();
@@ -244,7 +246,8 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             "labels" => $show_labels,
             "survey" => $is_survey,
             "exceptions" => $exceptions,
-            "actionTags" => $actionTags ?: array()
+            "hard_check" => $enable_hard_check,
+            "actionTags" => $actionTags ?: array(),
         );
 
         $this->renderJavascript($js_params);
@@ -259,7 +262,8 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         $lang = array(
             "dialog_1" => $this->tt("u_dialog_1"),
             "dialog_1_5" => $this->tt("u_dialog_1_5"),
-            "dialog_2" => $this->tt("u_dialog_2"),            
+            "dialog_2" => $this->tt("u_dialog_2"),
+            "dialog_2_5" => $this->tt("u_dialog_2_5"),
             "dialog_3" => $this->tt("u_dialog_3"),
             "dialog_4" => $this->tt("w_dialog_1"),
             "dialog_5" => $this->tt("w_dialog_2"),
