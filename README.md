@@ -72,3 +72,4 @@ v1.2.0  | Improve error handling. Add exceptions for unique-strict.
 v1.2.1  | Cover all exception cases. Code cleanup and improvement.
 v1.2.2  | Adjust dialogs, add internationlization for German.
 v1.2.3  | Add hard check option which disables Save Buttons during uniqueness check.
+v1.2.4  | Minor Security Fix.
