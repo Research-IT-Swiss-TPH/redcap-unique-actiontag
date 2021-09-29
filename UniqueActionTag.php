@@ -272,10 +272,10 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         // Define request parameters
         $request = array(
             "url" => $this->getUrl("requestHandler.php"),
-            "pid" => $_GET["pid"],
-            "record" => $_GET["id"],
-            "event_id" => $_GET["event_id"],
-            "instance" => $_GET["instance"]
+            "pid" =>  htmlentities($_GET["pid"], ENT_QUOTES),
+            "record" => htmlentities($_GET['id'], ENT_QUOTES),
+            "event_id" => htmlentities($_GET["event_id"], ENT_QUOTES),
+            "instance" => htmlentities($_GET["instance"], ENT_QUOTES)
         );
         //  Include Babel compiled Javascript file (`npm run build`) and initialize module script with parameters
         ?>
