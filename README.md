@@ -52,6 +52,18 @@ Usage:
 @UNIQUE-STRICT="field_1, field_2"
 ```
 
+## Custom Dialog in Survey Mode
+Since version **1.2.5** there is the optional and additional Action Tag `@UNIQUE-DIALOG` which enables a custom dialog message and title for the current field in Survey Mode. 
+Usage:
+
+```JS
+// Can only be used with parameters;
+// Adds title and message to dialog of current field in Survey Mode
+// First parameter sets title, second parameter sets message
+@UNIQUE-DIALOG="Custom Title, This is a custom message!"
+```
+
+
 ## Developer Notice
 
 **Feature and pull requests** are welcome!
