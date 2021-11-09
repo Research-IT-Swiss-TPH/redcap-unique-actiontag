@@ -175,10 +175,10 @@ STPH_UniqueAT.ActionTagClass = class {
                 } else {
                     $('input[name=' + this.requestData.field + ']').removeClass("has-duplicate-warning");                                                  
                 }
-                   
-                this.finalizeCheck();
+                                
             }
 
+            this.finalizeCheck();
     }
 
     bindOnBlur() {
@@ -228,6 +228,7 @@ STPH_UniqueAT.ActionTagClass = class {
             });
         }
         else {
+            STPH_UniqueAT.log("Field set to empty");
             this.toggleUI('remove-duplicate');
             this.onPageCheckUnique();
         }
@@ -245,7 +246,7 @@ STPH_UniqueAT.ActionTagClass = class {
     }
 
     evaluateSaveState(){
-        STPH_UniqueAT.log("Evaluating Save State");
+        STPH_UniqueAT.log("Evaluating Save State");        
         var duplicates = $('.has-duplicate-error, .has-duplicate-warning');
         if(duplicates.length > 0) {
             this.toggleUI('hide-save-buttons');
@@ -273,10 +274,12 @@ STPH_UniqueAT.ActionTagClass = class {
 
             case 'show-save-buttons':
                 $('#formSaveTip button, #form button').prop("disabled", false);
+                $('button[name="submit-btn-saverecord"]').prop("disabled", false);
                 break;
 
             case 'hide-save-buttons':
                 $('#formSaveTip button, #form button').prop("disabled", true);
+                $('button[name="submit-btn-saverecord"]').prop("disabled", true);
                 break;
             
             case 'show-duplicate':                

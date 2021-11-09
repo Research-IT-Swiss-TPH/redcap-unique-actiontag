@@ -36,6 +36,14 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         $this->renderActionTag($project_id, $instrument, $record, $event_id, $repeat_instance, NULL);
     }
 
+    /**
+     * Survey Page
+     * 
+     */
+    public function redcap_survey_page_top( $project_id, $record = NULL, $instrument, $event_id, $group_id = NULL, $survey_hash, $response_id = NULL, $repeat_instance = 1 ) {
+        $this->renderActionTag($project_id, $instrument, $record, $event_id, $repeat_instance, NULL);
+    }
+
 
     /**
      * Adds custom action tag explanations to REDCap Action Tags explanation
@@ -158,7 +166,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
      */
     private function renderActionTag($project_id, $instrument, $record, $event_id, $instance, $survey_hash = null) {
         
-        global $Proj;
+        //global $Proj;
         $is_survey = $survey_hash != NULL;
 
         $field_params = $this->getFieldParams();
