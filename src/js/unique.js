@@ -297,18 +297,35 @@ STPH_UniqueAT.ActionTagClass = class {
                         optional = STPH_UniqueAT.lang.dialog_2_5 + filteredTargets.join();
                     } 
 
-                    simpleDialog(
-                        STPH_UniqueAT.lang.dialog_1 + ' "'+this.atv.field + '" ' + STPH_UniqueAT.lang.dialog_1_5 + STPH_UniqueAT.lang.dialog_2+' ("' + this.ob.value + '") '+ optional + lang.period+' '+STPH_UniqueAT.lang.dialog_3,
-                        lang.data_entry_105 + " " + this.requestData.tag, 
-                        'suf_warning_dialog'
-                    );
+                    //  Support Custom Messages in Survey Mode
+                    let dialogSupport = STPH_UniqueAT.params.actionTags.uniqueDialog[this.atv.field];
+                    if(STPH_UniqueAT.params.survey && dialogSupport) {
+                        let msg = dialogSupport[0].message
+                        let title = dialogSupport[0].title
+                        simpleDialog(msg, title, 'suf_warning_dialog');
+                    } else {
+                        simpleDialog(
+                            STPH_UniqueAT.lang.dialog_1 + ' "'+this.atv.field + '" ' + STPH_UniqueAT.lang.dialog_1_5 + STPH_UniqueAT.lang.dialog_2+' ("' + this.ob.value + '") '+ optional + lang.period+' '+STPH_UniqueAT.lang.dialog_3,
+                            lang.data_entry_105 + " " + this.requestData.tag, 
+                            'suf_warning_dialog'
+                        );
+                    }
                 }                   
                 break;
 
             case 'show-warning':
                 STPH_UniqueAT.log('Warn of duplicate for field ' + this.atv.field );     
                 if(dialog){
-                    simpleDialog( STPH_UniqueAT.lang.dialog_4 + ' ' + duplicates +' ' +  STPH_UniqueAT.lang.dialog_5 + ' ' + this.atv.field);
+                    //  Support Custom Messages in Survey Mode
+                    let dialogSupport = STPH_UniqueAT.params.actionTags.uniqueDialog[this.atv.field];
+                    if(STPH_UniqueAT.params.survey && dialogSupport) {
+                        let msg = dialogSupport[0].message
+                        let title = dialogSupport[0].title
+                        simpleDialog(msg, title, 'suf_warning_dialog');
+                    } else {
+                        simpleDialog( STPH_UniqueAT.lang.dialog_4 + ' ' + duplicates +' ' +  STPH_UniqueAT.lang.dialog_5 + ' ' + this.atv.field);
+                    }
+                    
                 }
                 break;
 
