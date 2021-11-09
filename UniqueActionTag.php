@@ -15,14 +15,17 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
 
     private $atUnique = "@UNIQUE";
     private $atUniqueStrict = "@UNIQUE-STRICT";
+    private $atUniqueDialog = "@UNIQUE-DIALOG";
     
     private $actionTags;
 
     function __construct() {
         $this->actionTags = array (
             $this->atUnique,
-            $this->atUniqueStrict
+            $this->atUniqueStrict,
+            $this->atUniqueDialog
         );
+
         parent::__construct();
     }
 
@@ -34,6 +37,14 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
      */
     public function redcap_data_entry_form ($project_id, $record = NULL, $instrument, $event_id, $group_id = NULL, $repeat_instance = 1) {
         $this->renderActionTag($project_id, $instrument, $record, $event_id, $repeat_instance, NULL);
+    }
+
+    /**
+     * Survey Page
+     * 
+     */
+    public function redcap_survey_page_top( $project_id, $record = NULL, $instrument, $event_id, $group_id = NULL, $survey_hash, $response_id = NULL, $repeat_instance = 1 ) {
+        $this->renderActionTag($project_id, $instrument, $record, $event_id, $repeat_instance, $survey_hash);
     }
 
 
@@ -106,6 +117,8 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                             case $this->atUniqueStrict:
                                 //  Skip this because not relevant                              
                                 break;
+                            default:
+                                break;
                         }
 
                     }
@@ -127,6 +140,16 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                                     $param_final = array_values(array_unique($param_array));
                                     $param = array (
                                         "targets" => $param_final
+                                    );
+                                    break;
+                                case $this->atUniqueDialog:
+                                    $param_array = array_map('trim', explode(',', $param));
+                                    $title= $param_array[0];
+                                    $msg = $param_array[1];
+                                    $param = array (
+                                        "title" => $title,
+                                        "message" =>  $msg
+                                        
                                     );
                                     break;
                             }
@@ -158,7 +181,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
      */
     private function renderActionTag($project_id, $instrument, $record, $event_id, $instance, $survey_hash = null) {
         
-        global $Proj;
+        //global $Proj;
         $is_survey = $survey_hash != NULL;
 
         $field_params = $this->getFieldParams();
@@ -168,7 +191,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         $tags = array();
 
         $fields = REDCap::getFieldNames($instrument);
-        array_push($tags, $this->atUnique, $this->atUniqueStrict);
+        array_push($tags, $this->atUnique, $this->atUniqueStrict, $this->atUniqueDialog);
 
         // Filter for active fields only and count
         $active_uniques = 0;
@@ -193,6 +216,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                 }
             }
         }
+
 
         // Anything to do? At least one widget and autofill must be present
         if ($active_uniques + $active_unique_stricts + $active_other == 0) {

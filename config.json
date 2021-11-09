@@ -11,6 +11,7 @@
      ],
      "framework-version": 3,
      "permissions": [
+         "redcap_survey_page_top",
          "redcap_data_entry_form",
          "redcap_every_page_top"
      ],
