@@ -298,8 +298,8 @@ STPH_UniqueAT.ActionTagClass = class {
                     } 
 
                     //  Support Custom Messages in Survey Mode
-                    let dialogSupport = STPH_UniqueAT.params.actionTags.uniqueDialog[this.atv.field];
-                    if(STPH_UniqueAT.params.survey && dialogSupport) {
+                    if(STPH_UniqueAT.params.survey && STPH_UniqueAT.params.actionTags.uniqueDialog) {
+                        let dialogSupport = STPH_UniqueAT.params.actionTags.uniqueDialog[this.atv.field];
                         let msg = dialogSupport[0].message
                         let title = dialogSupport[0].title
                         simpleDialog(msg, title, 'suf_warning_dialog');
