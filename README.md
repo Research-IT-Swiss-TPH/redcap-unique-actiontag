@@ -86,3 +86,4 @@ v1.2.2  | Adjust dialogs, add internationlization for German.
 v1.2.3  | Add hard check option which disables Save Buttons during uniqueness check.
 v1.2.4  | Minor Security Fix.
 v1.2.5  | Add support for survey mode. Custom dialog for survey mode. Minor UX improvement.
+v1.2.6  | Bug fixes.
