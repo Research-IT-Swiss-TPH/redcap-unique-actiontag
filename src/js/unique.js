@@ -151,15 +151,17 @@ STPH_UniqueAT.ActionTagClass = class {
                 
                 var duplicateValues = [];
                 
-                //  Cleanup all targets before checking
-                var targets = this.ob.dataset.targets.split(",");
-                targets.forEach( (target) => {
-                    var targetValue = $('input[name=' + target + ']').val();
-                    $('input[name=' + target + ']').removeClass("has-duplicate-warning")
-                    if(targetValue == this.requestData.value && targetValue!= "" && this.requestData.value != "") {
-                        duplicateValues.push(target);
-                    }
-                })
+                //  Cleanup all targets before checking if there are targets
+                if(this.ob.dataset.targets) {
+                    var targets = this.ob.dataset.targets.split(",");
+                    targets.forEach( (target) => {
+                        var targetValue = $('input[name=' + target + ']').val();
+                        $('input[name=' + target + ']').removeClass("has-duplicate-warning")
+                        if(targetValue == this.requestData.value && targetValue!= "" && this.requestData.value != "") {
+                            duplicateValues.push(target);
+                        }
+                    })
+                }
     
                 //  Check if value is an exception
                 var isException =  STPH_UniqueAT.params.exceptions.includes(this.requestData.value);
