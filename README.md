@@ -2,6 +2,8 @@
 
 A REDCap external module providing action tags that make fields unique.
 
+**Important: Survey Page not supported**
+
 ## Requirements
 
 - REDCAP 10.1.0 or newer.
@@ -52,16 +54,6 @@ Usage:
 @UNIQUE-STRICT="field_1, field_2"
 ```
 
-## Custom Dialog in Survey Mode
-Since version **1.2.5** there is the optional and additional Action Tag `@UNIQUE-DIALOG` which enables a custom dialog message and title for the current field in Survey Mode. 
-Usage:
-
-```JS
-// Can only be used with parameters;
-// Adds title and message to dialog of current field in Survey Mode
-// First parameter sets title, second parameter sets message
-@UNIQUE-DIALOG="Custom Title, This is a custom message!"
-```
 
 
 ## Developer Notice
@@ -87,3 +79,4 @@ v1.2.3  | Add hard check option which disables Save Buttons during uniqueness ch
 v1.2.4  | Minor Security Fix.
 v1.2.5  | Add support for survey mode. Custom dialog for survey mode. Minor UX improvement.
 v1.2.6  | Bug fixes.
+v1.2.7  | Dropping support for Survey Page mode due to issues.

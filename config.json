@@ -1,7 +1,7 @@
 {
     "name": "Unique Action Tag",
     "namespace": "STPH\\UniqueActionTag", 
-    "description": "A REDCap external module providing action tags that make fields unique.",
+    "description": "**Important: Survey Page not supported** A REDCap external module providing action tags that make fields unique in Data Entry.",
     "authors": [
         {
              "name": "Ekin Tertemiz",
