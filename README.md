@@ -4,10 +4,6 @@ A REDCap external module providing action tags that make fields unique.
 
 **Important: Survey Page not supported**
 
-## Requirements
-
-- REDCAP 10.1.0 or newer.
-
 ## Installation
 
 Automatic installation:
