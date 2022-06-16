@@ -17,5 +17,6 @@
     "action tag"
   ],
   "author": "Ekin Tertemiz",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {}
 }

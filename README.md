@@ -80,3 +80,4 @@ v1.2.4  | Minor Security Fix.
 v1.2.5  | Add support for survey mode. Custom dialog for survey mode. Minor UX improvement.
 v1.2.6  | Bug fixes.
 v1.2.7  | Dropping support for Survey Page mode due to issues.
+v2.0.0  | Upgrade to Module Frame version 9. Minor Bug Fix for Custom Dialog Messages.
