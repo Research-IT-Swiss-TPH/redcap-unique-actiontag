@@ -2,6 +2,10 @@
 
 use \REDCap as REDCap;
 
+if (file_exists("vendor/autoload.php")) {
+    require 'vendor/autoload.php';
+}
+
 /**
  * Class UniqueActionTag
  * Author: Ekin Tertemiz
@@ -30,7 +34,6 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
     }
 
     #region Hooks
-
     
     /**
      * Triggers module logic on every data entry form
@@ -352,6 +355,10 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             if($tag == $this->atUnique) {
 
                 // Get a count of all duplicated values for the $secondary_pk field (exclude submitted record name when counting)
+/*                 $sql = "select count(1) from redcap_data where project_id = '$project_id' and field_name IN('".$targets."')
+                and value = '" . db_escape($value) . "' and record != '' and record != '" . db_escape($record) . "'";
+                $q = db_query($sql); */
+
                 $sql = "select count(1) from redcap_data where project_id = ? and field_name IN(?)
                 and value = ? and record != '' and record != ?";  
                 $q = $this->query($sql, [$project_id, $targets, $value, $record]);
@@ -365,13 +372,21 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
 
                 $event_id = $data["event_id"];
                 //$instance = $data["instance"];
+            
+/*                 $sql = "SELECT (
+                        (SELECT count(1) FROM redcap_data WHERE project_id = '$project_id' AND field_name IN('".$targets."') AND value = '" . db_escape($value) . "' AND record != '' ) - 
+                        (SELECT count(1) FROM redcap_data WHERE project_id = '$project_id' AND field_name = '$field' AND value = '" . db_escape($value) . "' AND record = '$record' AND event_id = '$event_id' )
+                        )";
+                $q = db_query($sql); */
                 
                 $sql = "SELECT (
                     (SELECT count(1) FROM redcap_data WHERE project_id = ? AND field_name IN(?) AND value = ? AND record != '' ) - 
                     (SELECT count(1) FROM redcap_data WHERE project_id = ? AND field_name = ? AND value = ? AND record = ? AND event_id = ? )
                     )";
                 $q = $this->query($sql, [$project_id, $targets, $value, $project_id, $field, $value, $record, $event_id]);
-
+                
+                //print_r(mysqli_fetch_row($q));
+                
                 print db_result($q, 0);
             }
 
