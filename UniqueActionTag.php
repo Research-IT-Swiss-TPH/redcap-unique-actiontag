@@ -349,45 +349,43 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             $record = db_escape($data["record"]);
             $value = db_escape($data["value"]);
             $field = db_escape($data["field"]);
-            $targets = implode("','",$data["targets"]);
+            //$targets = implode("','", $data["targets"]);
             $tag = db_escape($data["tag"]);
+            # Set event id
+            $event_id = $data["event_id"];
            
             if($tag == $this->atUnique) {
 
-                // Get a count of all duplicated values for the $secondary_pk field (exclude submitted record name when counting)
-/*                 $sql = "select count(1) from redcap_data where project_id = '$project_id' and field_name IN('".$targets."')
-                and value = '" . db_escape($value) . "' and record != '' and record != '" . db_escape($record) . "'";
-                $q = db_query($sql); */
-
-                $sql = "select count(1) from redcap_data where project_id = ? and field_name IN(?)
-                and value = ? and record != '' and record != ?";  
-                $q = $this->query($sql, [$project_id, $targets, $value, $record]);
+                # We have to use createQuery to explicitly add In-Clause, otherwise the In-Statement fails with parameterized queries.
+                $query = $this->createQuery();
+                $query->add("select count(1) from redcap_data where project_id = ? and value = ? and record != '' and record != ?", [$project_id, $value, $record]);
+                $query->add("and")->addInClause('field_name', $data["targets"]);
+                $execute = $query->execute();
+                $result = db_result($execute, 0);
 
                 // Return the number of duplicates
-                print db_result($q, 0);
+                echo $result;
 
             }
 
             if($tag == $this->atUniqueStrict) {
 
-                $event_id = $data["event_id"];
-                //$instance = $data["instance"];
-            
-/*                 $sql = "SELECT (
-                        (SELECT count(1) FROM redcap_data WHERE project_id = '$project_id' AND field_name IN('".$targets."') AND value = '" . db_escape($value) . "' AND record != '' ) - 
-                        (SELECT count(1) FROM redcap_data WHERE project_id = '$project_id' AND field_name = '$field' AND value = '" . db_escape($value) . "' AND record = '$record' AND event_id = '$event_id' )
-                        )";
-                $q = db_query($sql); */
+                # We have to use createQuery to explicitly add In-Clause, otherwise the In-Statement fails with parameterized queries.
+                # Therefore the actual query has to be split into two parts..
+                $query_1 = $this->createQuery();
+                $query_1->add("SELECT count(1) FROM redcap_data WHERE project_id = ? AND value = ? AND record != ''", [$project_id, $value]);
+                $query_1->add("AND")->addInClause('field_name', $data["targets"]);
+                $execute = $query_1->execute();
+                $result_1 = db_result($execute, 0);
+
+                $sql = "SELECT count(1) FROM redcap_data WHERE project_id = ? AND field_name = ? AND value = ? AND record = ? AND event_id = ?";
+                $query_2 = $this->query($sql, [$project_id, $field, $value, $record, $event_id]);
+                $result_2 = db_result($query_2, 0);
+
+                $result = $result_1 - $result_2;
                 
-                $sql = "SELECT (
-                    (SELECT count(1) FROM redcap_data WHERE project_id = ? AND field_name IN(?) AND value = ? AND record != '' ) - 
-                    (SELECT count(1) FROM redcap_data WHERE project_id = ? AND field_name = ? AND value = ? AND record = ? AND event_id = ? )
-                    )";
-                $q = $this->query($sql, [$project_id, $targets, $value, $project_id, $field, $value, $record, $event_id]);
-                
-                //print_r(mysqli_fetch_row($q));
-                
-                print db_result($q, 0);
+                //  Return number of duplicates
+                echo $result;
             }
 
         } catch(\Exception $e) {
