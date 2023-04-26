@@ -349,17 +349,17 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             $record = db_escape($data["record"]);
             $value = db_escape($data["value"]);
             $field = db_escape($data["field"]);
-            //$targets = implode("','", $data["targets"]);
+            $targets = $this->escape($data["targets"]);
             $tag = db_escape($data["tag"]);
             # Set event id
-            $event_id = $data["event_id"];
+            $event_id = $this->escape($data["event_id"]);
            
             if($tag == $this->atUnique) {
 
                 # We have to use createQuery to explicitly add In-Clause, otherwise the In-Statement fails with parameterized queries.
                 $query = $this->createQuery();
                 $query->add("select count(1) from redcap_data where project_id = ? and value = ? and record != '' and record != ?", [$project_id, $value, $record]);
-                $query->add("and")->addInClause('field_name', $data["targets"]);
+                $query->add("and")->addInClause('field_name', $targets);
                 $execute = $query->execute();
                 $result = db_result($execute, 0);
 
