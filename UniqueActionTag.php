@@ -19,6 +19,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
 
     private $atUnique = "@UNIQUE";
     private $atUniqueStrict = "@UNIQUE-STRICT";
+    private $atUniqueInstance = "@UNIQUE-INSTANCE";
     private $atUniqueDialog = "@UNIQUE-DIALOG";
     
     private $actionTags;
@@ -27,6 +28,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         $this->actionTags = array (
             $this->atUnique,
             $this->atUniqueStrict,
+            $this->atUniqueInstance,
             $this->atUniqueDialog
         );
 
@@ -71,6 +73,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                 "{HELPTITLE}" => $this->tt("helptitle"),
                 "{ADD}" => $this->tt("button_add"),
                 "{UNIQUE_DESC}" => $this->tt("unique_desc"),
+                "{UNIQUE_INSTANCE_DESC}" => $this->tt("unique_instance_desc"),
                 "{UNIQUE_STRICT_DESC}" => $this->tt("unique_strict_desc")
 
             );
@@ -117,6 +120,13 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                                     "error" => ""                                
                                 );
                                 break;
+                            case $this->atUniqueInstance:
+                                    $param = array (
+                                        "targets" => array($field),
+                                        "field" => $field,
+                                        "error" => ""                                
+                                    );
+                                break;
                             case $this->atUniqueStrict:
                                 //  Skip this because not relevant                              
                                 break;
@@ -145,6 +155,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                                         "targets" => $param_final
                                     );
                                     break;
+                                case $this->atUniqueInstance:
                                 case $this->atUniqueDialog:
                                     $param_array = array_map('trim', explode(',', $param));
                                     $title= $param_array[0];
@@ -194,11 +205,12 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         $tags = array();
 
         $fields = REDCap::getFieldNames($instrument);
-        array_push($tags, $this->atUnique, $this->atUniqueStrict, $this->atUniqueDialog);
+        array_push($tags, $this->atUnique, $this->atUniqueStrict, $this->atUniqueInstance, $this->atUniqueDialog);
 
         // Filter for active fields only and count
         $active_uniques = 0;
         $active_unique_stricts = 0;
+        $active_unique_instance = 0;
         $active_other = 0;
         $active_fields = array();
         foreach ($tags as $tag) {
@@ -213,6 +225,9 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                     else if($tag == $this->atUniqueStrict) {
                         $active_unique_stricts++;
                     }
+                    else if($tag == $this->atUniqueInstance) {
+                        $active_unique_instance++;
+                    }
                     else {
                         $active_other++;
                     }
@@ -222,7 +237,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
 
 
         // Anything to do? At least one widget and autofill must be present
-        if ($active_uniques + $active_unique_stricts + $active_other == 0) {
+        if ($active_uniques + $active_unique_stricts + $active_other + $active_unique_instance == 0) {
             return;
         }
 
@@ -349,6 +364,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             $record = db_escape($data["record"]);
             $value = db_escape($data["value"]);
             $field = db_escape($data["field"]);
+            $instance = db_escape($data["instance"]);
             $targets = $this->escape($data["targets"]);
             $tag = db_escape($data["tag"]);
             # Set event id
@@ -386,6 +402,50 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                 
                 //  Return number of duplicates
                 echo $result;
+            }
+
+            if($tag == $this->atUniqueInstance) {
+                # We have to use createQuery to explicitly add In-Clause, otherwise the In-Statement fails with parameterized queries.
+                #condition that checks for uniqueness between records.
+                $query = $this->createQuery();
+                $query->add("select count(1) from redcap_data where project_id = ? and value = ? and record != '' and record != ?", [$project_id, $value, $record]);
+                $query->add("and")->addInClause('field_name', $data["targets"]);
+                $execute = $query->execute();
+                $queryResult1 = db_result($execute, 0);
+
+                #if ($queryResult1 > 0){
+                #    echo $queryResult1;// Return the number of duplicates
+                #} 
+
+                #the code below checks for uniquness between instances of the same record
+                $query = $this->createQuery();
+                $query->add("select value from redcap_data where project_id = ? and record = ? and instance is null", [$project_id,$record]); #first instance
+                $query->add("and")->addInClause('field_name', $data["targets"]);
+                $execute = $query->execute();
+                $firstValue = db_result($execute, 0); 
+
+                if($instance == 2){#condition that checks if the second instance of the instrument has a duplicate field
+                    if($firstValue == $value){#if the value of the first instance is the same with the value being entered
+                        echo 1;// Return the number of duplicates
+                    }else{
+                        echo 0;// Return the number of duplicates
+                    }
+
+                }elseif ($instance >= 3){
+                    $result_1 = 0;
+                    $query2 = $this->createQuery();
+                    $query2->add("select count(1) from redcap_data WHERE project_id = ? AND value = ? AND record = ? and instance != ?", [$project_id, $value, $record,$instance]);
+                    $query2->add("and")->addInClause('field_name', $data["targets"]);
+                    $execute2 = $query2->execute();
+                    $queryResult2 = db_result($execute2, 0);
+                    
+                    if($firstValue == $value){#if the value of the first instance is the same with the value being entered
+                        $result_1 = 1;
+                    }
+                    $resultFinal = $result_1 + $queryResult2 ;
+                    
+                    echo $resultFinal;// Return the number of duplicates
+                }
             }
 
         } catch(\Exception $e) {
