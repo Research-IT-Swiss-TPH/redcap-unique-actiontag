@@ -413,9 +413,9 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                 $execute = $query->execute();
                 $queryResult1 = db_result($execute, 0);
 
-                #if ($queryResult1 > 0){
-                #    echo $queryResult1;// Return the number of duplicates
-                #} 
+                if ($queryResult1 > 0){
+                    echo $queryResult1;// Return the number of duplicates
+                } 
 
                 #the code below checks for uniquness between instances of the same record
                 $query = $this->createQuery();
