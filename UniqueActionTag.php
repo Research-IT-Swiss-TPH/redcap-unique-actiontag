@@ -140,6 +140,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                         if (!is_array($param)) {
                             switch($tag) {
                                 case $this->atUniqueStrict:
+                                case $this->atUniqueInstance:
                                 case $this->atUnique:
                                     $error = $param;
                                     if(empty($param)){
@@ -155,7 +156,6 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                                         "targets" => $param_final
                                     );
                                     break;
-                                case $this->atUniqueInstance:
                                 case $this->atUniqueDialog:
                                     $param_array = array_map('trim', explode(',', $param));
                                     $title= $param_array[0];
@@ -405,48 +405,19 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             }
 
             if($tag == $this->atUniqueInstance) {
-                # We have to use createQuery to explicitly add In-Clause, otherwise the In-Statement fails with parameterized queries.
-                #condition that checks for uniqueness between records.
                 $query = $this->createQuery();
-                $query->add("select count(1) from redcap_data where project_id = ? and value = ? and record != '' and record != ?", [$project_id, $value, $record]);
+                $query->add(
+                // I have also added event_id which is not strictly necessary, but as a preparation for the future, in case it is used in multiple events scenarios and should not break.
+                // IFNULL() solves the problem with instance 1 being NULL in the database.
+                "SELECT count(1) FROM redcap_data WHERE project_id = ? AND event_id = ? AND value = ? AND record != '' AND record = ? AND IFNULL(instance, 1) != ?", 
+                              [$project_id, $event_id, $value, $record, $instance]
+                );
                 $query->add("and")->addInClause('field_name', $data["targets"]);
                 $execute = $query->execute();
-                $queryResult1 = db_result($execute, 0);
-
-                if ($queryResult1 > 0){
-                    echo $queryResult1;// Return the number of duplicates
-                } 
-
-                #the code below checks for uniquness between instances of the same record
-                $query = $this->createQuery();
-                $query->add("select value from redcap_data where project_id = ? and record = ? and instance is null", [$project_id,$record]); #first instance
-                $query->add("and")->addInClause('field_name', $data["targets"]);
-                $execute = $query->execute();
-                $firstValue = db_result($execute, 0); 
-
-                if($instance == 2){#condition that checks if the second instance of the instrument has a duplicate field
-                    if($firstValue == $value){#if the value of the first instance is the same with the value being entered
-                        echo 1;// Return the number of duplicates
-                    }else{
-                        echo 0;// Return the number of duplicates
-                    }
-
-                }elseif ($instance >= 3){
-                    $result_1 = 0;
-                    $query2 = $this->createQuery();
-                    $query2->add("select count(1) from redcap_data WHERE project_id = ? AND value = ? AND record = ? and instance != ?", [$project_id, $value, $record,$instance]);
-                    $query2->add("and")->addInClause('field_name', $data["targets"]);
-                    $execute2 = $query2->execute();
-                    $queryResult2 = db_result($execute2, 0);
-                    
-                    if($firstValue == $value){#if the value of the first instance is the same with the value being entered
-                        $result_1 = 1;
-                    }
-                    $resultFinal = $result_1 + $queryResult2 ;
-                    
-                    echo $resultFinal;// Return the number of duplicates
-                }
-            }
+                $result = db_result($execute, 0);
+          
+                echo $result;
+             }
 
         } catch(\Exception $e) {
 
