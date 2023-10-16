@@ -1,7 +1,7 @@
 {
     "name": "Unique Action Tag",
     "namespace": "STPH\\UniqueActionTag", 
-    "description": "**Important: Survey Page not supported** A REDCap external module providing action tags that make fields unique in Data Entry.",
+    "description": "<b>Please note that Survey Page is not supported</b><br>A REDCap external module providing action tags that make fields unique in Data Entry.",
     "authors": [
         {
              "name": "Ekin Tertemiz",
@@ -9,12 +9,8 @@
              "institution": "Swiss Tropical and Public Health Institute (STPH)"
          }
      ],
-     "framework-version": 9,
-     "permissions": [
-         "redcap_survey_page_top",
-         "redcap_data_entry_form",
-         "redcap_every_page_top"
-     ],
+     "framework-version": 12,
+
      "system-settings": [
      ],
      "project-settings": [
@@ -40,7 +36,7 @@
          }
      ],
      "compatibility": {
-        "php-version-min": "7.2.5",
-        "redcap-version-min": "12.0.4"
+        "php-version-min": "8.0.0",
+        "redcap-version-min": "13.1.0"
       }
  }
