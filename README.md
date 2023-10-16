@@ -62,6 +62,17 @@ Usage:
 @UNIQUE-INSTANCE
 ```
 
+### @UNIQUE-DIALOG
+
+In case of no uniqueness, triggers a dialog with custom title and message.
+
+Usage:
+
+```JS
+//  can be used together with other UNIQUE action tags
+@UNIQUE-DIALOG="Custom Title, This is a custom message!"
+```
+
 ## Developer Notice
 
 **Feature and pull requests** are welcome!
