@@ -50,7 +50,17 @@ Usage:
 @UNIQUE-STRICT="field_1, field_2"
 ```
 
+### @UNIQUE-INSTANCE
 
+Makes the field unique within the same record's instances.
+
+Usage:
+
+```JS
+// can only be used without parameters; 
+// The field itself becomes unique within within the same record's instances.
+@UNIQUE-INSTANCE
+```
 
 ## Developer Notice
 
@@ -77,3 +87,4 @@ v1.2.5  | Add support for survey mode. Custom dialog for survey mode. Minor UX i
 v1.2.6  | Bug fixes.
 v1.2.7  | Dropping support for Survey Page mode due to issues.
 v2.0.0  | Upgrade to Module Frame version 9. Minor Bug Fix for Custom Dialog Messages.
+v2.0.3  | Added instance check with @UNIQUE-INSTANCE. 
