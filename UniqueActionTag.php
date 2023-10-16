@@ -40,7 +40,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
     /**
      * Triggers module logic on every data entry form
      */
-    public function redcap_data_entry_form ($project_id, $record = NULL, $instrument, $event_id, $group_id = NULL, $repeat_instance = 1) {
+    public function redcap_data_entry_form ($project_id, $record = NULL, $instrument, $event_id, $group_id = NULL, $repeat_instance) {
         $this->renderActionTag($project_id, $instrument, $record, $event_id, $repeat_instance, NULL);
     }
 
