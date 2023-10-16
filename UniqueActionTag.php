@@ -24,16 +24,17 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
     
     private $actionTags;
 
-    function __construct() {
-        $this->actionTags = array (
-            $this->atUnique,
-            $this->atUniqueStrict,
-            $this->atUniqueInstance,
-            $this->atUniqueDialog
-        );
+    //  constructor needs to be removed, since it triggers manual review in REDCap Repo Submission process
+    // function __construct() {
+        // $this->actionTags = array (
+        //     $this->atUnique,
+        //     $this->atUniqueStrict,
+        //     $this->atUniqueInstance,
+        //     $this->atUniqueDialog
+        // );
 
-        parent::__construct();
-    }
+    //     parent::__construct();
+    // }
 
     #region Hooks
     
@@ -194,6 +195,13 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
      * @param @survey_hash
      */
     private function renderActionTag($project_id, $instrument, $record, $event_id, $instance, $survey_hash = null) {
+
+        $this->actionTags = array (
+            $this->atUnique,
+            $this->atUniqueStrict,
+            $this->atUniqueInstance,
+            $this->atUniqueDialog
+        );        
         
         //global $Proj;
         $is_survey = $survey_hash != NULL;
