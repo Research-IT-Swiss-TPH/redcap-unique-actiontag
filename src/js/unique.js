@@ -299,8 +299,8 @@ STPH_UniqueAT.ActionTagClass = class {
                         optional = STPH_UniqueAT.lang.dialog_2_5 + filteredTargets.join();
                     } 
 
-                    //  Support Custom Messages in Survey Mode
-                    if(STPH_UniqueAT.params.survey && STPH_UniqueAT.params.actionTags.uniqueDialog) {
+                    //  Support Custom Messages (UNIQUE-DIALOG)
+                    if(STPH_UniqueAT.params.actionTags.uniqueDialog) {
                         let dialogSupport = STPH_UniqueAT.params.actionTags.uniqueDialog[this.atv.field];
                         let msg = dialogSupport[0].message
                         let title = dialogSupport[0].title
@@ -318,8 +318,8 @@ STPH_UniqueAT.ActionTagClass = class {
             case 'show-warning':
                 STPH_UniqueAT.log('Warn of duplicate for field ' + this.atv.field );     
                 if(dialog){
-                    //  Support Custom Messages in Survey Mode
-                    if(STPH_UniqueAT.params.survey &&  STPH_UniqueAT.params.actionTags.uniqueDialog) {
+                    //  Support Custom Messages (UNIQUE-DIALOG)
+                    if(STPH_UniqueAT.params.actionTags.uniqueDialog) {
                         let dialogSupport = STPH_UniqueAT.params.actionTags.uniqueDialog[this.atv.field];
                         let msg = dialogSupport[0].message
                         let title = dialogSupport[0].title
