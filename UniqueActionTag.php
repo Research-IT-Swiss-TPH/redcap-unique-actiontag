@@ -388,7 +388,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                 $result = db_result($execute, 0);
 
                 // Return the number of duplicates
-                echo $result;
+                echo $this->escape($result);
 
             }
 
@@ -409,7 +409,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                 $result = $result_1 - $result_2;
                 
                 //  Return number of duplicates
-                echo $result;
+                echo $this->escape($result);
             }
 
             if($tag == $this->atUniqueInstance) {
@@ -424,7 +424,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                 $execute = $query->execute();
                 $result = db_result($execute, 0);
           
-                echo $result;
+                echo $this->escape($result);
              }
 
         } catch(\Exception $e) {
