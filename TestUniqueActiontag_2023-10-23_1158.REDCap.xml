@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:redcap="https://projectredcap.org" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 schema/odm/ODM1-3-1.xsd" ODMVersion="1.3.1" FileOID="000-00-0000" FileType="Snapshot" Description="Test Unique Actiontag" AsOfDateTime="2023-10-23T11:58:15" CreationDateTime="2023-10-23T11:58:15" SourceSystem="REDCap" SourceSystemVersion="13.10.5">
+<Study OID="Project.TestUniqueActiontag">
+<GlobalVariables>
+	<StudyName>Test Unique Actiontag</StudyName>
+	<StudyDescription>This file contains the metadata, events, and data for REDCap project "Test Unique Actiontag".</StudyDescription>
+	<ProtocolName>Test Unique Actiontag</ProtocolName>
+	<redcap:RecordAutonumberingEnabled>1</redcap:RecordAutonumberingEnabled>
+	<redcap:CustomRecordLabel></redcap:CustomRecordLabel>
+	<redcap:SecondaryUniqueField></redcap:SecondaryUniqueField>
+	<redcap:SchedulingEnabled>0</redcap:SchedulingEnabled>
+	<redcap:SurveysEnabled>0</redcap:SurveysEnabled>
+	<redcap:SurveyInvitationEmailField></redcap:SurveyInvitationEmailField>
+	<redcap:DisplayTodayNowButton>1</redcap:DisplayTodayNowButton>
+	<redcap:PreventBranchingEraseValues>0</redcap:PreventBranchingEraseValues>
+	<redcap:RequireChangeReason>0</redcap:RequireChangeReason>
+	<redcap:DataHistoryPopup>1</redcap:DataHistoryPopup>
+	<redcap:OrderRecordsByField></redcap:OrderRecordsByField>
+	<redcap:MyCapEnabled>0</redcap:MyCapEnabled>
+	<redcap:Purpose>0</redcap:Purpose>
+	<redcap:PurposeOther></redcap:PurposeOther>
+	<redcap:ProjectNotes></redcap:ProjectNotes>
+	<redcap:MissingDataCodes></redcap:MissingDataCodes>
+	<redcap:ProtectedEmailMode>0</redcap:ProtectedEmailMode>
+	<redcap:ProtectedEmailModeCustomText></redcap:ProtectedEmailModeCustomText>
+	<redcap:ProtectedEmailModeTrigger>ALL</redcap:ProtectedEmailModeTrigger>
+	<redcap:ProtectedEmailModeLogo></redcap:ProtectedEmailModeLogo>
+</GlobalVariables>
+<MetaDataVersion OID="Metadata.TestUniqueActiontag_2023-10-23_1158" Name="Test Unique Actiontag" redcap:RecordIdField="record_id">
+	<FormDef OID="Form.test_unique" Name="Test Unique" Repeating="No" redcap:FormName="test_unique">
+		<ItemGroupRef ItemGroupOID="test_unique.record_id" Mandatory="No"/>
+		<ItemGroupRef ItemGroupOID="test_unique.test_unique_complete" Mandatory="No"/>
+	</FormDef>
+	<FormDef OID="Form.test_unique_strict" Name="Test Unique Strict" Repeating="No" redcap:FormName="test_unique_strict">
+		<ItemGroupRef ItemGroupOID="test_unique_strict.test_unique_strict_solo" Mandatory="No"/>
+		<ItemGroupRef ItemGroupOID="test_unique_strict.test_unique_strict_complete" Mandatory="No"/>
+	</FormDef>
+	<FormDef OID="Form.test_unique_dialog" Name="Test Unique + Dialog" Repeating="No" redcap:FormName="test_unique_dialog">
+		<ItemGroupRef ItemGroupOID="test_unique_dialog.test_unique_with_dialog" Mandatory="No"/>
+		<ItemGroupRef ItemGroupOID="test_unique_dialog.test_unique_dialog_complete" Mandatory="No"/>
+	</FormDef>
+	<FormDef OID="Form.test_unique_strict_dialog" Name="Test Unique Strict + Dialog" Repeating="No" redcap:FormName="test_unique_strict_dialog">
+		<ItemGroupRef ItemGroupOID="test_unique_strict_dialog.test_unique_strict_with_di" Mandatory="No"/>
+		<ItemGroupRef ItemGroupOID="test_unique_strict_dialog.test_unique_strict_dialog_complete" Mandatory="No"/>
+	</FormDef>
+	<FormDef OID="Form.test_unique_unique_strict" Name="Test Unique + Unique Strict" Repeating="No" redcap:FormName="test_unique_unique_strict">
+		<ItemGroupRef ItemGroupOID="test_unique_unique_strict.test_unique_with_unique_st" Mandatory="No"/>
+		<ItemGroupRef ItemGroupOID="test_unique_unique_strict.test_unique_unique_strict_complete" Mandatory="No"/>
+	</FormDef>
+	<FormDef OID="Form.test_unique_with_dialog_unique_strict_with_dialog" Name="Test Unique with Dialog + Unique Strict with Dialog" Repeating="No" redcap:FormName="test_unique_with_dialog_unique_strict_with_dialog">
+		<ItemGroupRef ItemGroupOID="test_unique_with_dialog_unique_strict_with_dialog.unique_with_dialog_and_uni" Mandatory="No"/>
+		<ItemGroupRef ItemGroupOID="test_unique_with_dialog_unique_strict_with_dialog.test_unique_with_dialog_unique_strict_with_dialog_complete" Mandatory="No"/>
+	</FormDef>
+	<ItemGroupDef OID="test_unique.record_id" Name="Test Unique" Repeating="No">
+		<ItemRef ItemOID="record_id" Mandatory="No" redcap:Variable="record_id"/>
+		<ItemRef ItemOID="test_unique_solo" Mandatory="No" redcap:Variable="test_unique_solo"/>
+	</ItemGroupDef>
+	<ItemGroupDef OID="test_unique.test_unique_complete" Name="Form Status" Repeating="No">
+		<ItemRef ItemOID="test_unique_complete" Mandatory="No" redcap:Variable="test_unique_complete"/>
+	</ItemGroupDef>
+	<ItemGroupDef OID="test_unique_strict.test_unique_strict_solo" Name="Test Unique Strict" Repeating="No">
+		<ItemRef ItemOID="test_unique_strict_solo" Mandatory="No" redcap:Variable="test_unique_strict_solo"/>
+		<ItemRef ItemOID="helper_unique_strict_1" Mandatory="No" redcap:Variable="helper_unique_strict_1"/>
+	</ItemGroupDef>
+	<ItemGroupDef OID="test_unique_strict.test_unique_strict_complete" Name="Form Status" Repeating="No">
+		<ItemRef ItemOID="test_unique_strict_complete" Mandatory="No" redcap:Variable="test_unique_strict_complete"/>
+	</ItemGroupDef>
+	<ItemGroupDef OID="test_unique_dialog.test_unique_with_dialog" Name="Test Unique + Dialog" Repeating="No">
+		<ItemRef ItemOID="test_unique_with_dialog" Mandatory="No" redcap:Variable="test_unique_with_dialog"/>
+	</ItemGroupDef>
+	<ItemGroupDef OID="test_unique_dialog.test_unique_dialog_complete" Name="Form Status" Repeating="No">
+		<ItemRef ItemOID="test_unique_dialog_complete" Mandatory="No" redcap:Variable="test_unique_dialog_complete"/>
+	</ItemGroupDef>
+	<ItemGroupDef OID="test_unique_strict_dialog.test_unique_strict_with_di" Name="Test Unique Strict + Dialog" Repeating="No">
+		<ItemRef ItemOID="test_unique_strict_with_di" Mandatory="No" redcap:Variable="test_unique_strict_with_di"/>
+		<ItemRef ItemOID="unique_strict_helper_2" Mandatory="No" redcap:Variable="unique_strict_helper_2"/>
+	</ItemGroupDef>
+	<ItemGroupDef OID="test_unique_strict_dialog.test_unique_strict_dialog_complete" Name="Form Status" Repeating="No">
+		<ItemRef ItemOID="test_unique_strict_dialog_complete" Mandatory="No" redcap:Variable="test_unique_strict_dialog_complete"/>
+	</ItemGroupDef>
+	<ItemGroupDef OID="test_unique_unique_strict.test_unique_with_unique_st" Name="Test Unique + Unique Strict" Repeating="No">
+		<ItemRef ItemOID="test_unique_with_unique_st" Mandatory="No" redcap:Variable="test_unique_with_unique_st"/>
+		<ItemRef ItemOID="test_unique_strict_with_un" Mandatory="No" redcap:Variable="test_unique_strict_with_un"/>
+		<ItemRef ItemOID="helper_unique_3" Mandatory="No" redcap:Variable="helper_unique_3"/>
+	</ItemGroupDef>
+	<ItemGroupDef OID="test_unique_unique_strict.test_unique_unique_strict_complete" Name="Form Status" Repeating="No">
+		<ItemRef ItemOID="test_unique_unique_strict_complete" Mandatory="No" redcap:Variable="test_unique_unique_strict_complete"/>
+	</ItemGroupDef>
+	<ItemGroupDef OID="test_unique_with_dialog_unique_strict_with_dialog.unique_with_dialog_and_uni" Name="Test Unique with Dialog + Unique Strict with Dialog" Repeating="No">
+		<ItemRef ItemOID="unique_with_dialog_and_uni" Mandatory="No" redcap:Variable="unique_with_dialog_and_uni"/>
+		<ItemRef ItemOID="unique_strict_with_dialog" Mandatory="No" redcap:Variable="unique_strict_with_dialog"/>
+		<ItemRef ItemOID="unique_helper_4" Mandatory="No" redcap:Variable="unique_helper_4"/>
+	</ItemGroupDef>
+	<ItemGroupDef OID="test_unique_with_dialog_unique_strict_with_dialog.test_unique_with_dialog_unique_strict_with_dialog_complete" Name="Form Status" Repeating="No">
+		<ItemRef ItemOID="test_unique_with_dialog_unique_strict_with_dialog_complete" Mandatory="No" redcap:Variable="test_unique_with_dialog_unique_strict_with_dialog_complete"/>
+	</ItemGroupDef>
+	<ItemDef OID="record_id" Name="record_id" DataType="text" Length="999" redcap:Variable="record_id" redcap:FieldType="text">
+		<Question><TranslatedText>Record ID</TranslatedText></Question>
+	</ItemDef>
+	<ItemDef OID="test_unique_solo" Name="test_unique_solo" DataType="text" Length="999" redcap:Variable="test_unique_solo" redcap:FieldType="text" redcap:FieldAnnotation="@UNIQUE">
+		<Question><TranslatedText>Test Unique Solo</TranslatedText></Question>
+	</ItemDef>
+	<ItemDef OID="test_unique_complete" Name="test_unique_complete" DataType="text" Length="1" redcap:Variable="test_unique_complete" redcap:FieldType="select" redcap:SectionHeader="Form Status">
+		<Question><TranslatedText>Complete?</TranslatedText></Question>
+		<CodeListRef CodeListOID="test_unique_complete.choices"/>
+	</ItemDef>
+	<ItemDef OID="test_unique_strict_solo" Name="test_unique_strict_solo" DataType="text" Length="999" redcap:Variable="test_unique_strict_solo" redcap:FieldType="text" redcap:FieldAnnotation="@UNIQUE-STRICT=&quot;helper_unique_strict_1&quot;">
+		<Question><TranslatedText>Test Unique Strict</TranslatedText></Question>
+	</ItemDef>
+	<ItemDef OID="helper_unique_strict_1" Name="helper_unique_strict_1" DataType="text" Length="999" redcap:Variable="helper_unique_strict_1" redcap:FieldType="text">
+		<Question><TranslatedText>helper_unique_strict_1</TranslatedText></Question>
+	</ItemDef>
+	<ItemDef OID="test_unique_strict_complete" Name="test_unique_strict_complete" DataType="text" Length="1" redcap:Variable="test_unique_strict_complete" redcap:FieldType="select" redcap:SectionHeader="Form Status">
+		<Question><TranslatedText>Complete?</TranslatedText></Question>
+		<CodeListRef CodeListOID="test_unique_strict_complete.choices"/>
+	</ItemDef>
+	<ItemDef OID="test_unique_with_dialog" Name="test_unique_with_dialog" DataType="text" Length="999" redcap:Variable="test_unique_with_dialog" redcap:FieldType="text" redcap:FieldAnnotation="@UNIQUE
+@UNIQUE-DIALOG=&quot;Custom Title, This is a custom message!&quot;">
+		<Question><TranslatedText>Test Unique with Dialog</TranslatedText></Question>
+	</ItemDef>
+	<ItemDef OID="test_unique_dialog_complete" Name="test_unique_dialog_complete" DataType="text" Length="1" redcap:Variable="test_unique_dialog_complete" redcap:FieldType="select" redcap:SectionHeader="Form Status">
+		<Question><TranslatedText>Complete?</TranslatedText></Question>
+		<CodeListRef CodeListOID="test_unique_dialog_complete.choices"/>
+	</ItemDef>
+	<ItemDef OID="test_unique_strict_with_di" Name="test_unique_strict_with_di" DataType="text" Length="999" redcap:Variable="test_unique_strict_with_di" redcap:FieldType="text" redcap:FieldAnnotation="@UNIQUE-STRICT=&quot;unique_strict_helper_2&quot;
+@UNIQUE-DIALOG=&quot;Custom Title, This is a custom message!&quot;">
+		<Question><TranslatedText>Test Unique Strict With Dialog</TranslatedText></Question>
+	</ItemDef>
+	<ItemDef OID="unique_strict_helper_2" Name="unique_strict_helper_2" DataType="text" Length="999" redcap:Variable="unique_strict_helper_2" redcap:FieldType="text">
+		<Question><TranslatedText>unique_strict_helper_2</TranslatedText></Question>
+	</ItemDef>
+	<ItemDef OID="test_unique_strict_dialog_complete" Name="test_unique_strict_dialog_complete" DataType="text" Length="1" redcap:Variable="test_unique_strict_dialog_complete" redcap:FieldType="select" redcap:SectionHeader="Form Status">
+		<Question><TranslatedText>Complete?</TranslatedText></Question>
+		<CodeListRef CodeListOID="test_unique_strict_dialog_complete.choices"/>
+	</ItemDef>
+	<ItemDef OID="test_unique_with_unique_st" Name="test_unique_with_unique_st" DataType="text" Length="999" redcap:Variable="test_unique_with_unique_st" redcap:FieldType="text" redcap:FieldAnnotation="@UNIQUE">
+		<Question><TranslatedText>Test Unique with Unique Strict</TranslatedText></Question>
+	</ItemDef>
+	<ItemDef OID="test_unique_strict_with_un" Name="test_unique_strict_with_un" DataType="text" Length="999" redcap:Variable="test_unique_strict_with_un" redcap:FieldType="text" redcap:FieldAnnotation="@UNIQUE-STRICT=&quot;helper_unique_3&quot;">
+		<Question><TranslatedText>Test Unique Strict with Unique</TranslatedText></Question>
+	</ItemDef>
+	<ItemDef OID="helper_unique_3" Name="helper_unique_3" DataType="text" Length="999" redcap:Variable="helper_unique_3" redcap:FieldType="text">
+		<Question><TranslatedText>helper_unique_3</TranslatedText></Question>
+	</ItemDef>
+	<ItemDef OID="test_unique_unique_strict_complete" Name="test_unique_unique_strict_complete" DataType="text" Length="1" redcap:Variable="test_unique_unique_strict_complete" redcap:FieldType="select" redcap:SectionHeader="Form Status">
+		<Question><TranslatedText>Complete?</TranslatedText></Question>
+		<CodeListRef CodeListOID="test_unique_unique_strict_complete.choices"/>
+	</ItemDef>
+	<ItemDef OID="unique_with_dialog_and_uni" Name="unique_with_dialog_and_uni" DataType="text" Length="999" redcap:Variable="unique_with_dialog_and_uni" redcap:FieldType="text" redcap:FieldAnnotation="@UNIQUE
+@UNIQUE-DIALOG=&quot;Title 1, Content 1&quot;">
+		<Question><TranslatedText>Unique with Dialog and Unique Strict</TranslatedText></Question>
+	</ItemDef>
+	<ItemDef OID="unique_strict_with_dialog" Name="unique_strict_with_dialog" DataType="text" Length="999" redcap:Variable="unique_strict_with_dialog" redcap:FieldType="text" redcap:FieldAnnotation="@UNIQUE-STRICT=&quot;unique_helper_4&quot;
+@UNIQUE-DIALOG=&quot;Title 2, Content 2&quot;">
+		<Question><TranslatedText>Unique Strict with Dialog and Unique</TranslatedText></Question>
+	</ItemDef>
+	<ItemDef OID="unique_helper_4" Name="unique_helper_4" DataType="text" Length="999" redcap:Variable="unique_helper_4" redcap:FieldType="text">
+		<Question><TranslatedText>unique_helper_4</TranslatedText></Question>
+	</ItemDef>
+	<ItemDef OID="test_unique_with_dialog_unique_strict_with_dialog_complete" Name="test_unique_with_dialog_unique_strict_with_dialog_complete" DataType="text" Length="1" redcap:Variable="test_unique_with_dialog_unique_strict_with_dialog_complete" redcap:FieldType="select" redcap:SectionHeader="Form Status">
+		<Question><TranslatedText>Complete?</TranslatedText></Question>
+		<CodeListRef CodeListOID="test_unique_with_dialog_unique_strict_with_dialog_complete.choices"/>
+	</ItemDef>
+	<CodeList OID="test_unique_complete.choices" Name="test_unique_complete" DataType="text" redcap:Variable="test_unique_complete">
+		<CodeListItem CodedValue="0"><Decode><TranslatedText>Incomplete</TranslatedText></Decode></CodeListItem>
+		<CodeListItem CodedValue="1"><Decode><TranslatedText>Unverified</TranslatedText></Decode></CodeListItem>
+		<CodeListItem CodedValue="2"><Decode><TranslatedText>Complete</TranslatedText></Decode></CodeListItem>
+	</CodeList>
+	<CodeList OID="test_unique_strict_complete.choices" Name="test_unique_strict_complete" DataType="text" redcap:Variable="test_unique_strict_complete">
+		<CodeListItem CodedValue="0"><Decode><TranslatedText>Incomplete</TranslatedText></Decode></CodeListItem>
+		<CodeListItem CodedValue="1"><Decode><TranslatedText>Unverified</TranslatedText></Decode></CodeListItem>
+		<CodeListItem CodedValue="2"><Decode><TranslatedText>Complete</TranslatedText></Decode></CodeListItem>
+	</CodeList>
+	<CodeList OID="test_unique_dialog_complete.choices" Name="test_unique_dialog_complete" DataType="text" redcap:Variable="test_unique_dialog_complete">
+		<CodeListItem CodedValue="0"><Decode><TranslatedText>Incomplete</TranslatedText></Decode></CodeListItem>
+		<CodeListItem CodedValue="1"><Decode><TranslatedText>Unverified</TranslatedText></Decode></CodeListItem>
+		<CodeListItem CodedValue="2"><Decode><TranslatedText>Complete</TranslatedText></Decode></CodeListItem>
+	</CodeList>
+	<CodeList OID="test_unique_strict_dialog_complete.choices" Name="test_unique_strict_dialog_complete" DataType="text" redcap:Variable="test_unique_strict_dialog_complete">
+		<CodeListItem CodedValue="0"><Decode><TranslatedText>Incomplete</TranslatedText></Decode></CodeListItem>
+		<CodeListItem CodedValue="1"><Decode><TranslatedText>Unverified</TranslatedText></Decode></CodeListItem>
+		<CodeListItem CodedValue="2"><Decode><TranslatedText>Complete</TranslatedText></Decode></CodeListItem>
+	</CodeList>
+	<CodeList OID="test_unique_unique_strict_complete.choices" Name="test_unique_unique_strict_complete" DataType="text" redcap:Variable="test_unique_unique_strict_complete">
+		<CodeListItem CodedValue="0"><Decode><TranslatedText>Incomplete</TranslatedText></Decode></CodeListItem>
+		<CodeListItem CodedValue="1"><Decode><TranslatedText>Unverified</TranslatedText></Decode></CodeListItem>
+		<CodeListItem CodedValue="2"><Decode><TranslatedText>Complete</TranslatedText></Decode></CodeListItem>
+	</CodeList>
+	<CodeList OID="test_unique_with_dialog_unique_strict_with_dialog_complete.choices" Name="test_unique_with_dialog_unique_strict_with_dialog_complete" DataType="text" redcap:Variable="test_unique_with_dialog_unique_strict_with_dialog_complete">
+		<CodeListItem CodedValue="0"><Decode><TranslatedText>Incomplete</TranslatedText></Decode></CodeListItem>
+		<CodeListItem CodedValue="1"><Decode><TranslatedText>Unverified</TranslatedText></Decode></CodeListItem>
+		<CodeListItem CodedValue="2"><Decode><TranslatedText>Complete</TranslatedText></Decode></CodeListItem>
+	</CodeList>
+</MetaDataVersion>
+</Study>
+</ODM>
