@@ -48,6 +48,7 @@ STPH_UniqueAT.init = function() {
     $('#field_validation_error_state').val(1)
 
     // Check for errors
+    // not implemented
     if (STPH_UniqueAT.params.errors) {
         //showError(STPH_UniqueAT.params.unique);        
     }
@@ -94,7 +95,11 @@ STPH_UniqueAT.ActionTagClass = class {
         this.writeLabels();
         if( this.atv.error ) {
             STPH_UniqueAT.log('Error: ['+ this.requestData.tag +'][' + this.atv.field + ']' + this.atv.error + '.)');
-        } else {
+        } 
+        if( this.atv.tag == "@UNIQUE-DIALOG") {
+            STPH_UniqueAT.log('['+ this.requestData.tag +'][' + this.atv.field + '] Custom Dialog detected.');
+        }
+        else {
             this.bindOnBlur();
             this.bindAfterAjax();
             this.ajaxCheckUnique('on-load');
@@ -102,7 +107,7 @@ STPH_UniqueAT.ActionTagClass = class {
     }
 
     writeLabels() {
-        if (STPH_UniqueAT.params.labels) {
+        if (STPH_UniqueAT.params.labels && this.requestData.tag != "@UNIQUE-DIALOG") {
             STPH_UniqueAT.log('['+ this.requestData.tag +'][' + this.atv.field + '] Apply actiontag with target(s): ' + this.atv.targets + '.)');
             var label = $('#label-'+this.atv.field+' tr').find("td:first");
             label.html(label.text() + '<div style="font-weight:100;font-size:12px;">('+this.requestData.tag+')</div>')

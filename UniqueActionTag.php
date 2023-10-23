@@ -75,7 +75,8 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                 "{ADD}" => $this->tt("button_add"),
                 "{UNIQUE_DESC}" => $this->tt("unique_desc"),
                 "{UNIQUE_INSTANCE_DESC}" => $this->tt("unique_instance_desc"),
-                "{UNIQUE_STRICT_DESC}" => $this->tt("unique_strict_desc")
+                "{UNIQUE_STRICT_DESC}" => $this->tt("unique_strict_desc"),
+                "{UNIQUE_DIALOG_DESC}" => $this->tt("unique_dialog_desc")
 
             );
             print str_replace(array_keys($replace), array_values($replace), $template);
@@ -163,7 +164,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                                     $param = array (
                                         "title" => $title,
                                         "message" => $msg
-                                        
+
                                     );
                                     break;
                             }
@@ -264,7 +265,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             $exceptions = array_map('trim', explode(',', $exceptions_str ));
         }
 
-        // Augment unqiue fields with some metadata (field type, ...)
+        // Augment unique fields with some metadata (field type, ...)
         foreach ($active_fields as $tag => &$field_info) {
             foreach ($field_info as $field_name => &$data) {
                 $fmd = $project->getFieldMetadata($field_name);
@@ -287,6 +288,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             }
 
         }
+
 
         // Prepare parameter array to be passed to Javascript
         $js_params = array (
