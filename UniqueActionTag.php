@@ -117,19 +117,18 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                             case $this->atUnique:
                                 $param = array (
                                     "targets" => array($field),
-                                    "field" => $field,
-                                    "error" => ""                                
+                                    "field" => $field
                                 );
                                 break;
                             case $this->atUniqueInstance:
                                     $param = array (
                                         "targets" => array($field),
-                                        "field" => $field,
-                                        "error" => ""                                
+                                        "field" => $field                        
                                     );
                                 break;
                             case $this->atUniqueStrict:
-                                //  Skip this because not relevant                              
+                            case $this->atUniqueDialog:
+                                //  This means, the action tag is incomplete (missing Action Tag Parameter). For now skip it, but giving a notice would be better.
                                 break;
                             default:
                                 break;
@@ -163,7 +162,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                                     $msg = $param_array[1];
                                     $param = array (
                                         "title" => $title,
-                                        "message" =>  $msg
+                                        "message" => $msg
                                         
                                     );
                                     break;
