@@ -9,7 +9,7 @@
              "institution": "Swiss Tropical and Public Health Institute (STPH)"
          }
      ],
-     "framework-version": 12,
+     "framework-version": 15,
 
      "system-settings": [
      ],
@@ -37,6 +37,6 @@
      ],
      "compatibility": {
         "php-version-min": "8.0.0",
-        "redcap-version-min": "13.1.0"
+        "redcap-version-min": "14.0.2"
       }
  }
