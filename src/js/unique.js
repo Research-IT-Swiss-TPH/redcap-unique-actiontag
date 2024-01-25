@@ -305,7 +305,7 @@ STPH_UniqueAT.ActionTagClass = class {
                     } 
 
                     //  Support Custom Messages (UNIQUE-DIALOG)
-                    if(STPH_UniqueAT.params.actionTags.uniqueDialog) {
+                    if(STPH_UniqueAT.params.actionTags.uniqueDialog[this.atv.field]) {
                         let dialogSupport = STPH_UniqueAT.params.actionTags.uniqueDialog[this.atv.field];
                         let msg = dialogSupport[0].message
                         let title = dialogSupport[0].title
