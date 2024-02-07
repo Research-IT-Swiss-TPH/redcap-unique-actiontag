@@ -367,7 +367,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
      */
     public function handleActionTag($data) {  
 
-        try {          
+        try {
 
             $project_id = db_escape($data["pid"]);
             $record = db_escape($data["record"]);
@@ -378,12 +378,15 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             $tag = db_escape($data["tag"]);
             # Set event id
             $event_id = $this->escape($data["event_id"]);
+
+            # Support multiple redcap_data tables
+            $data_table = method_exists('\REDCap', 'getDataTable') ? \REDCap::getDataTable($project_id) : "redcap_data";
            
             if($tag == $this->atUnique) {
 
                 # We have to use createQuery to explicitly add In-Clause, otherwise the In-Statement fails with parameterized queries.
                 $query = $this->createQuery();
-                $query->add("select count(1) from redcap_data where project_id = ? and value = ? and record != '' and record != ?", [$project_id, $value, $record]);
+                $query->add("select count(1) from ".$data_table." where project_id = ? and value = ? and record != '' and record != ?", [$project_id, $value, $record]);
                 $query->add("and")->addInClause('field_name', $targets);
                 $execute = $query->execute();
                 $result = db_result($execute, 0);
@@ -398,12 +401,12 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                 # We have to use createQuery to explicitly add In-Clause, otherwise the In-Statement fails with parameterized queries.
                 # Therefore the actual query has to be split into two parts..
                 $query_1 = $this->createQuery();
-                $query_1->add("SELECT count(1) FROM redcap_data WHERE project_id = ? AND value = ? AND record != ''", [$project_id, $value]);
+                $query_1->add("SELECT count(1) FROM ".$data_table." WHERE project_id = ? AND value = ? AND record != ''", [$project_id, $value]);
                 $query_1->add("AND")->addInClause('field_name', $data["targets"]);
                 $execute = $query_1->execute();
                 $result_1 = db_result($execute, 0);
 
-                $sql = "SELECT count(1) FROM redcap_data WHERE project_id = ? AND field_name = ? AND value = ? AND record = ? AND event_id = ?";
+                $sql = "SELECT count(1) FROM ".$data_table." WHERE project_id = ? AND field_name = ? AND value = ? AND record = ? AND event_id = ?";
                 $query_2 = $this->query($sql, [$project_id, $field, $value, $record, $event_id]);
                 $result_2 = db_result($query_2, 0);
 
@@ -418,7 +421,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                 $query->add(
                 // I have also added event_id which is not strictly necessary, but as a preparation for the future, in case it is used in multiple events scenarios and should not break.
                 // IFNULL() solves the problem with instance 1 being NULL in the database.
-                "SELECT count(1) FROM redcap_data WHERE project_id = ? AND event_id = ? AND value = ? AND record != '' AND record = ? AND IFNULL(instance, 1) != ?", 
+                "SELECT count(1) FROM ".$data_table." WHERE project_id = ? AND event_id = ? AND value = ? AND record != '' AND record = ? AND IFNULL(instance, 1) != ?", 
                               [$project_id, $event_id, $value, $record, $instance]
                 );
                 $query->add("and")->addInClause('field_name', $data["targets"]);

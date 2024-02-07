@@ -98,4 +98,6 @@ v1.2.5  | Add support for survey mode. Custom dialog for survey mode. Minor UX i
 v1.2.6  | Bug fixes.
 v1.2.7  | Dropping support for Survey Page mode due to issues.
 v2.0.0  | Upgrade to Module Frame version 9. Minor Bug Fix for Custom Dialog Messages.
-v2.0.3  | Added instance check with @UNIQUE-INSTANCE. 
+v2.0.3  | Added instance check with @UNIQUE-INSTANCE.
+v2.2.1  | Fix a JavaScript bug in Unique Actiontag introduced through change in REDCap backend.
+v2.3.0  | Support multiple redcap_data tables.
