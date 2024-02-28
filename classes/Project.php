@@ -32,14 +32,14 @@ class Project
         return $this->project_id;
     }
 
-    /**
-     * Gets an instance of the Record class.
-     * @return Record 
-     */
-    function getRecord($record_id) {
-        if (!class_exists("STPH\UniqueActionTag\Record")) include_once ("Record.php");
-        return new Record($this->framework, $this, $record_id);
-    }
+    // /**
+    //  * Gets an instance of the Record class.
+    //  * @return Record 
+    //  */
+    // function getRecord($record_id) {
+    //     if (!class_exists("STPH\UniqueActionTag\Record")) include_once ("Record.php");
+    //     return new Record($this->framework, $this, $record_id);
+    // }
 
 
     /**
