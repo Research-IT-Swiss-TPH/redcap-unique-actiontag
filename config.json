@@ -1,0 +1,61 @@
+{
+    "name": "Unique Action Tag",
+    "namespace": "STPH\\UniqueActionTag", 
+    "description": "<b>Please note that Survey Page is not supported</b><br>A REDCap external module providing action tags that make fields unique in Data Entry.",
+    "authors": [
+        {
+             "name": "Ekin Tertemiz",
+             "email": "ekin.tertemiz@swisstph.ch",
+             "institution": "Swiss Tropical and Public Health Institute (Swiss TPH)"
+         }
+     ],
+     "framework-version": 15,
+
+     "system-settings": [
+     ],
+     "project-settings": [
+         {
+             "key": "show-labels",
+             "name": "Show actiontag information label on data entry pages",
+             "type": "checkbox"
+         },
+         {
+             "key": "javascript-debug",
+             "name": "Output debug information to the browser console",
+             "type": "checkbox"
+         },
+         {
+            "key": "exceptions",
+            "name": "Comma separated list of exceptions (for unique-strict only)",
+            "type": "text"
+         },
+         {
+             "key": "enable-hard-check",
+             "name": "Enable Hard Check<br>Disable Save Buttons if there are violations of uniqueness within a record's data entry page.",
+             "type": "checkbox"
+         }
+     ],
+     "action-tags":
+     [
+        {
+            "tag": "@UNIQUE", 
+            "description": "Add uniqueness across records to the field and (if supplied) to other fields."
+        },
+        {
+            "tag": "@UNIQUE-STRICT", 
+            "description": "Add uniqueness across records and within the same record to the field itself and (if supplied) to other fields."
+        },
+        {
+            "tag": "@UNIQUE-INSTANCE",
+            "description": "Add uniqueness across records and instances of the same record to the field itself."
+        },
+        {
+            "tag": "@UNIQUE-DIALOG",
+            "description": "Add a custom dialog that will be displayed in case of violation of uniqueness."
+        }
+     ],
+
+     "compatibility": {
+        "php-version-min": "8.0.0"
+      }
+ }

@@ -1,0 +1,19 @@
+{
+  "name": "redcap_unique_actiontag",
+  "version": "3.0.0",
+  "description": "A REDCap external module providing action tags that make fields unique. ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Research-IT-Swiss-TPH/redcap-unique-actiontag.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Research-IT-Swiss-TPH/redcap-unique-actiontag/issues"
+  },
+  "homepage": "https://github.com/Research-IT-Swiss-TPH/redcap-unique-actiontag#readme"
+}
