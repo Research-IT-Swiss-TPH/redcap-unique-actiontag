@@ -2,6 +2,46 @@
 
 use \REDCap as REDCap;
 
+/**
+ * Class ActionTagHelper
+ * 
+ * Author: Ekin Tertemiz
+ * Based on ActionTagHelper by Andy Martin:
+ * https://gist.github.com/123andy/dd262439c0478ffbd37e4685bc8017ac
+ * Modified to accept explicit parsing for ActionTags by tagnames and
+ * differentiate between empty (flat) Action Tags and those with parameters.
+ * 
+ * Adds parameter validation, in case Action Tags were defined with specific syntax:
+ * 
+ * $actionTagName = [
+ *      "tag" => "@MY-ACTION-TAG",              //  defines tag name for use
+ *      "params" =>  [                          //  defines array of tag parameters
+ *          [
+ *              "name" => "param-name-1",       //  defines parameter name for tag use
+ *              "type" => "boolean",            //  defines parameter type as boolean, to be validated when tag used
+ *              "required" => true              //  defines if parameter must be explicitly listed when tag used
+ *          ],
+ *          [
+ *              "name" => "param-name-2",
+ *              "type" => "array",
+ *              "reqired" => false
+ *          ],
+ *          [
+ *              "name" => "param-name-3",
+ *              "type" => "string",
+ *              "requried" => false
+ *          ]
+ *      ],
+ *      "allowed_field_types" => [              //  defines allowed field types where the tag can be used
+ *          "text", 
+ *          "notes"
+ *      ],
+ *      "allowFlat" => true,                    //  enable/disable use of tag without parameters
+ *      "allowMultiple" => true,                //  enable/disable use of tag multiple times per field
+ *      "allowStacking" => []                   //  enable/disable use of tag stacked with other tags
+ *  ] 
+ * 
+ */
 class ActionTagHelper
 {
     private Array $actionTags;
@@ -13,6 +53,9 @@ class ActionTagHelper
      /**
       * RegEx template to parse empty ActionTags
       * https://www.phpliveregex.com/p/Lgo
+      * 
+      * typed class constants are supported in PHP > 8.3
+      * https://php.watch/versions/8.3/typed-constants
       *
       */
      const REGEX_EMPTY_TAG = "/(?<actiontag>(?<![a-zA-Z0-9\_\-\=])(%TAGNAMES%)(?![a-zA-Z0-9\_\-\=]))/x";
@@ -20,6 +63,9 @@ class ActionTagHelper
      /**
       * RegEx template to parse parametrized ActionTags
       * https://www.phpliveregex.com/p/Lgp
+      *
+      * typed class constants are supported in PHP > 8.3
+      * https://php.watch/versions/8.3/typed-constants
       *
       */
      const REGEX_PARAM_TAG ="/
@@ -37,24 +83,24 @@ class ActionTagHelper
         (?:\= (?'params' (?: (?'match_list'(?&fieldlist)) | (?'match_json'(?&json)) | (?'match_string'(?:[[:alnum:]\_\-]+))))
      )/x";
 
+
     public function __construct(Array $actionTags = []) {
         $this->actionTags = $actionTags;
         $this->setRegEx();
     }
 
-    public function addActionTag($actiontag) {
+    public function addActionTag(Array $actiontag): void {
         $title = $actiontag["tag"];
         unset($actiontag["tag"]);
         $this->actionTags[$title] = $actiontag;
         $this->setRegEx();
     }
 
-    public function getActionTags(){
+    public function getActionTags(): Array {
         return $this->actionTags;
     }
 
-    private function setRegEx() {
-        
+    private function setRegEx(): void {
         $allowedActionTags = array_keys($this->actionTags);
         $tagnames  = implode(" | ", $allowedActionTags);
 
@@ -64,29 +110,35 @@ class ActionTagHelper
 
 
     /**
-     * Get Action Tag Data by parsing field meta data
-     * Parse for empty (flat) tags and parametrized tags
+     * Get Action Tag Data
      * 
-     * Return an array grouped by fields
      * 
      */
-    function getActionTagData($fields = NULL, $instruments = NULL) {
+    function getActionTagData(Array|Null $fields = NULL, Array|Null $instruments = NULL): Array {
         
-        // Get the metadata with applied filters
+        // Get the metadata with applied filters fields, instruments
         $this->getMetaData($fields, $instruments);
 
-        // Build action tag data Array
+        // Build Action Tag Data
         $this->buildActionTagData();
 
         return $this->actionTagData;
     }
 
-    function getMetaData($fields, $instruments) {
+    /**
+     * Get Meta Data
+     * 
+     */
+    function getMetaData(Array|Null $fields, Array|Null $instruments) {
         $q = REDCap::getDataDictionary('json', false, $fields, $instruments);
         $this->fieldMetaData = json_decode ($q, true );
     }
 
-    function buildActionTagData() {
+    /**
+     * Build Action Tag data
+     * 
+     */
+    function buildActionTagData(): void {
 
         $actionTagData = array();
 
@@ -103,10 +155,17 @@ class ActionTagHelper
         $this->actionTagData =  $actionTagData;
     }
 
-    function parseActionTags($field) {
+    /**
+     * Parse field meta data with RegEx patterns, 
+     * for empty and parametrized Action Tags.
+     * 
+     * 
+     */
+    function parseActionTags(Array $field): Bool|Array {
 
-        //  Process regEx on field annotation and return matches
-        //  replace /n /r with white space, since they might break the RegEx
+        $results = array();
+
+        //  replace /n /r with white space, since they might break the RegEx patterns
         $fieldMeta = str_replace(array("\n", "\r"), ' ', $field['field_annotation']);
 
         preg_match_all($this->regEx_emptyTag, $fieldMeta, $matches_emptyTag);
@@ -114,14 +173,10 @@ class ActionTagHelper
 
         // Return false if none are found
         $hasParamTags = is_array($matches_paramTag['actiontag']) && count($matches_paramTag['actiontag']) !== 0;
-        $hasEmptyTags = is_array($matches_emptyTag['actiontag']) && count($matches_emptyTag['actiontag']) !== 0;
-        
+        $hasEmptyTags = is_array($matches_emptyTag['actiontag']) && count($matches_emptyTag['actiontag']) !== 0;        
         if (!$hasParamTags && !$hasEmptyTags) return false;
 
-        $results = array();
-
         if($hasEmptyTags) {
-
             foreach ($matches_emptyTag['actiontag'] as $i => $tag) {
                 $results[] = array(
                     'flat' => true,
@@ -137,7 +192,7 @@ class ActionTagHelper
 
                 $params = null;
 
-                $matched = $matches_emptyTag['params'][$i];
+                $matched = $matches_paramTag['params'][$i];
                 $tag = strtoupper($tag);
 
                 $atFTypes = $this->actionTags[$tag]["allowed_field_types"];
@@ -161,7 +216,8 @@ class ActionTagHelper
                 else if($isJSON && !$isString && !$isString) {
                     
                     $decoded_params = json_decode($matched, true);
-
+                    
+                    //  Validate parameters
                     if(count($atParams) > 0) {
                         //  Loop through ActionTag definitions, ignore everything else
                         foreach ($atParams as $key => $value) {

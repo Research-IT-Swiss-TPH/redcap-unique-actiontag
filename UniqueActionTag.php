@@ -4,9 +4,6 @@ if (file_exists("vendor/autoload.php")) {
     require 'vendor/autoload.php';
 }
 
-use \REDCap as REDCap;
-
-
 class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
 
     /**
@@ -41,16 +38,15 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             "text", 
             "notes"
         ],
-        "allowMultiple" => false,   //  allow to be used with multiple instances of same action tag on the same field
-        //"allowStacking" => false  //  allow to be used with other action tags
+        "allowFlat" => true,        // default=true
+        "allowMultiple" => false,   //  allow to be used with multiple instances of same action tag on the same field, default=true
+        //"allowStacking" => false  //  allow to be used with other action tags, default=true
     ];
 
     private $actionTagTest = [
         "tag" => "@TEST",
         "allowed_field_types" => []
     ];
-
-
 
     /**
      * REDCap Hook - Data Entry Form
@@ -99,8 +95,6 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         $actionTagHelper = new ActionTagHelper();
         $actionTagHelper->addActionTag($this->actionTagUnique);
         $actionTagHelper->addActionTag($this->actionTagTest);
-
-        //dump($actionTagHelper->actionTags);
 
         $actionTagData = $actionTagHelper->getActionTagData(null, [$instrument]);
 
