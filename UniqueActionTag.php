@@ -38,14 +38,20 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             "text", 
             "notes"
         ],
-        "allowFlat" => true,        // default=true
-        "allowMultiple" => false,   //  allow to be used with multiple instances of same action tag on the same field, default=true
-        //"allowStacking" => false  //  allow to be used with other action tags, default=true
+        // allow to be sued without parameters, default=true
+        "allowFlat" => true,
+        //  allow to be used with multiple instances of same action tag on the same field
+        "allowMultiple" => false,
+        //  allow to be used with other action tags, default=true
+        //"allowStacking" => []  
     ];
 
     private $actionTagTest = [
         "tag" => "@TEST",
-        "allowed_field_types" => []
+        "allowed_field_types" => [],
+        "allowFlat" => true,
+        "allowMultiple" => true,
+        "allowStacking" => ["@UNIQUE"]
     ];
 
     /**
@@ -96,9 +102,10 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         $actionTagHelper->addActionTag($this->actionTagUnique);
         $actionTagHelper->addActionTag($this->actionTagTest);
 
-        $actionTagData = $actionTagHelper->getActionTagData(null, [$instrument]);
+        $actionTagData = $actionTagHelper->getData(null, [$instrument]);
 
         dump($actionTagData);
+
     }
     
     private function renderJavascript(){

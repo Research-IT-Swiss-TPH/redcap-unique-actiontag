@@ -45,10 +45,11 @@ use \REDCap as REDCap;
 class ActionTagHelper
 {
     private Array $actionTags;
+    private Array $fieldMetaData;
+    private Array $parsedData;
+    private Array $actionTagData;
     private String $regEx_emptyTag;
     private String $regEx_paramTag;
-    private Array $fieldMetaData;
-    private Array $actionTagData;
 
      /**
       * RegEx template to parse empty ActionTags
@@ -85,6 +86,7 @@ class ActionTagHelper
 
 
     public function __construct(Array $actionTags = []) {
+        $this->actionTagData = [];
         $this->actionTags = $actionTags;
         $this->setRegEx();
     }
@@ -114,13 +116,14 @@ class ActionTagHelper
      * 
      * 
      */
-    function getActionTagData(Array|Null $fields = NULL, Array|Null $instruments = NULL): Array {
+    public function getData(Array|Null $fields = NULL, Array|Null $instruments = NULL): Array {
         
         // Get the metadata with applied filters fields, instruments
         $this->getMetaData($fields, $instruments);
 
-        // Build Action Tag Data
-        $this->buildActionTagData();
+        $this->parseData();
+
+        $this->validate();
 
         return $this->actionTagData;
     }
@@ -129,41 +132,79 @@ class ActionTagHelper
      * Get Meta Data
      * 
      */
-    function getMetaData(Array|Null $fields, Array|Null $instruments) {
+    private function getMetaData(Array|Null $fields, Array|Null $instruments) {
         $q = REDCap::getDataDictionary('json', false, $fields, $instruments);
         $this->fieldMetaData = json_decode ($q, true );
     }
 
-    /**
-     * Build Action Tag data
-     * 
-     */
-    function buildActionTagData(): void {
-
-        $actionTagData = array();
-
+    private function parseData(): void {
+        //  parse action tags per field
         foreach ($this->fieldMetaData as $field) {
+            $this->parseActionTags($field);
+        }
+    }
 
-            //  parse action tags per field
-            $parsed_tags = $this->parseActionTags($field);
+    private function validate(): void {
 
-            if($parsed_tags) {
-                $actionTagData[$field["field_name"]] = $parsed_tags;
+        dump($this->parsedData);
+
+        $validated = [];
+        $errors = [
+            "not_allowed_flat" => [],
+            "not_allowed_multiple" => []
+            //,"not_allowed_stacking"=> []
+        ];
+        foreach ($this->parsedData as $key => $data) {
+
+            $tag = $data["tag"];
+            $flat = $data["flat"];
+            $field = $data["field"];
+
+            //  check if already occuring within errors
+            if( $flat && is_array($errors["not_allowed_flat"]) && in_array($tag, $errors["not_allowed_flat"])) continue;
+
+            if(is_array($errors["not_allowed_multiple"][$tag]) && in_array($field, $errors["not_allowed_multiple"][$tag])) continue;
+
+            // if(is_array($errors["not_allowed_stacking"][$tag]) && in_array($field, $errors["not_allowed_stacking"][$tag])) continue;
+
+            //  check allowFlat
+            if($flat && !$this->actionTags[$tag]["allowFlat"]) {
+                $errors["not_allowed_flat"][] = $tag;
+                dump("flat rule triggered");
             }
+            //  check allowMultiple per field
+            if(!$this->actionTags[$tag]["allow_multiple"] && isset($validated[$field][$tag])) {
+                $errors["not_allowed_multiple"][$tag][] = $field;
+                unset($validated[$field][$tag]);
+                if(count($validated[$field]) === 0) unset($validated[$field]);
+                continue;
+            }
+            
+            //  check allowStacking per field
+            //  tbd
+
+            $validated[$field][$tag] = array(
+                "tag"    => $tag,
+                "flat"   => $flat,
+                "params" => $data["params"],
+                "errors" => $data["errors"]
+            );
+
         }
 
-        $this->actionTagData =  $actionTagData;
+        $this->actionTagData = array(
+            'fields' => $validated,
+            'errors' => $errors 
+        );
+
     }
 
     /**
      * Parse field meta data with RegEx patterns, 
      * for empty and parametrized Action Tags.
      * 
-     * 
      */
-    function parseActionTags(Array $field): Bool|Array {
-
-        $results = array();
+    private function parseActionTags(Array $field): void {
 
         //  replace /n /r with white space, since they might break the RegEx patterns
         $fieldMeta = str_replace(array("\n", "\r"), ' ', $field['field_annotation']);
@@ -174,13 +215,14 @@ class ActionTagHelper
         // Return false if none are found
         $hasParamTags = is_array($matches_paramTag['actiontag']) && count($matches_paramTag['actiontag']) !== 0;
         $hasEmptyTags = is_array($matches_emptyTag['actiontag']) && count($matches_emptyTag['actiontag']) !== 0;        
-        if (!$hasParamTags && !$hasEmptyTags) return false;
+        if (!$hasParamTags && !$hasEmptyTags) return;
 
         if($hasEmptyTags) {
             foreach ($matches_emptyTag['actiontag'] as $i => $tag) {
-                $results[] = array(
-                    'flat' => true,
+                $this->parsedData[] = array(
                     'tag'   =>  $tag,
+                    'field' => $field["field_name"],
+                    'flat' => true,
                     'params' => null,
                     'errors' => null
                 );
@@ -241,15 +283,14 @@ class ActionTagHelper
                     
                 }
 
-                $results[] = array(
+                $this->parsedData[] = array(
                     'tag'   =>  $tag,
+                    'field' => $field["field_name"],
                     'flat' => false,
                     'params' => $params,
                     'errors' => $errors
                 );
-
             }
         }
-        return $results;
     }
 }
