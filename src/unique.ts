@@ -6,7 +6,8 @@ interface UAT_Module {
     data: UAT_Data
     params: UAT_Params,
     log: Function
-    init: Function
+    init: Function,
+    writeErrors: Function
 }
 
 interface UAT_Data {
@@ -26,7 +27,9 @@ interface UAT_Tag  {
         message: string
         targets: []
     }
-    tag: string
+    tag: string,
+    field: string,
+    field_type: string
 }
 
 interface UAT_Params {
@@ -35,7 +38,6 @@ interface UAT_Params {
     show_labels: boolean,
     enable_hard_check: boolean
 }
-
 
 window.STPH_UAT.log = function() {
 
@@ -60,12 +62,58 @@ window.STPH_UAT.log = function() {
 }
 
 window.STPH_UAT.init = function() {
-    this.log(this.data)
+    console.log(this.data)
+    this.writeErrors()
+
+    // Loop over all fields and tags, and create a new class for each
+    Object.keys(window.STPH_UAT.data.fields).forEach(function(field) {
+        //console.log(field)
+        Object.keys(window.STPH_UAT.data.fields[field]).forEach(function(tagname){
+            //console.log(tagname)
+            let data = window.STPH_UAT.data.fields[field][tagname]
+            new UniqueActionTag(data).init()
+        })
+        
+    })
 }
 
-window.STPH_UAT.init()
+window.STPH_UAT.writeErrors = function() {
+    if( window.STPH_UAT.data.errors.not_allowed_flat.length > 0 || window.STPH_UAT.data.errors.not_allowed_multiple.length > 0) {
+        $('#dataEntryTopOptions')
+        .append('<div class="alert alert-warning"><b>Unique Action Tag - External Module</b><br>Errors detected!</div>')
+        Object.keys(this.data.errors).forEach(error => {
+            console.log(error)
+        });
+    }
+}
 
-// Object.keys(window.STPH_UAT.data.fields).forEach(function(key) {
-//     console.log(window.STPH_UAT.data.fields[key])
-// })
+
+class UniqueActionTag {
+
+    private ob
+
+    constructor(private data:UAT_Tag) {
+        this.data = data
+        this.ob = document.getElementsByName(this.data.field)[0]
+    }
+
+    init(){
+        this.writeLabels()
+        this.writeErrors()
+    }
+
+    writeLabels(){
+        if(!window.STPH_UAT.params.show_labels) return
+        let label = $('#label-'+this.data.field+' tr').find('td:first');
+        label.html('<p>'+label.text() + '</p><p style="font-weight:100;font-size:12px;">('+this.data.tag+')</p>')
+    }
+
+
+    writeErrors(){
+        if(this.data.errors.length <= 0) return
+        
+
+    }
+
+}
 
