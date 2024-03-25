@@ -1,3 +1,4 @@
 /vendor
 *.lock
 /classes/*_v*.php
+node_modules

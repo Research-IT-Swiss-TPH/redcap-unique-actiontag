@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/Research-IT-Swiss-TPH/redcap-unique-actiontag/issues"
   },
-  "homepage": "https://github.com/Research-IT-Swiss-TPH/redcap-unique-actiontag#readme"
+  "homepage": "https://github.com/Research-IT-Swiss-TPH/redcap-unique-actiontag#readme",
+  "devDependencies": {
+    "@types/jquery": "^3.5.29"
+  }
 }
