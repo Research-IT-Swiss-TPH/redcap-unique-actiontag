@@ -116,9 +116,7 @@ class ActionTagHelper
         
         // Get the metadata with applied filters fields, instruments
         $this->getMetaData($fields, $instruments);
-
         $this->parseData();
-
         $this->validate();
 
         return $this->actionTagData;
@@ -157,8 +155,6 @@ class ActionTagHelper
             $tag    = $data["tag"];
             $flat   = $data["flat"];
             $field  = $data["field"];
-            $fieldParams = $data["params"];
-            $fieldErrors = $data["errors"];
 
             //  check allowFlat per field
             if($flat && !$this->actionTags[$tag]["allowFlat"] && !in_array($field, $errors["not_allowed_flat"][$tag] ?? [])) {
@@ -176,14 +172,12 @@ class ActionTagHelper
                 $hasErrors = true;
             }
 
-
+            /**
+             * Only add to validated if we have no errors
+             * 
+             */
             if($hasErrors === false) {
-                $validated[$field][$tag] = array(
-                    "tag"    => $tag,
-                    "flat"   => $flat,
-                    "params" => $fieldParams,
-                    "errors" => $fieldErrors
-                );
+                $validated[$field][$tag] = $data;
             }
 
         }
@@ -215,9 +209,14 @@ class ActionTagHelper
 
         if($hasEmptyTags) {
             foreach ($matches_emptyTag['actiontag'] as $i => $tag) {
+
+                $atFTypes = $this->actionTags[$tag]["allowed_field_types"];
+                if( isset($atFTypes) && !empty($atFTypes) && !in_array($field['field_type'], $atFTypes)) continue;
+
                 $this->parsedData[] = array(
                     'tag'   =>  $tag,
                     'field' => $field["field_name"],
+                    'field_type' => $field["field_type"],
                     'flat' => true,
                     'params' => null,
                     'errors' => null
@@ -236,7 +235,7 @@ class ActionTagHelper
                 $atFTypes = $this->actionTags[$tag]["allowed_field_types"];
                 $atParams = $this->actionTags[$tag]["params"] ?? [];
 
-                //  Check if is allowed field_type
+                //Check if is allowed field_type
                 if( isset($atFTypes) && !empty($atFTypes) && !in_array($field['field_type'], $atFTypes)) continue;
 
                 $isList = $matches_paramTag["match_list"][$i] !== "";
@@ -282,6 +281,7 @@ class ActionTagHelper
                 $this->parsedData[] = array(
                     'tag'   =>  $tag,
                     'field' => $field["field_name"],
+                    'field_type' => $field["field_type"],
                     'flat' => false,
                     'params' => $params,
                     'errors' => $errors
