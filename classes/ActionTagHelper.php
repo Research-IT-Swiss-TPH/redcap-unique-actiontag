@@ -91,15 +91,11 @@ class ActionTagHelper
         $this->setRegEx();
     }
 
-    public function addActionTag(Array $actiontag): void {
+    public function define(Array $actiontag): void {
         $title = $actiontag["tag"];
         unset($actiontag["tag"]);
         $this->actionTags[$title] = $actiontag;
         $this->setRegEx();
-    }
-
-    public function getActionTags(): Array {
-        return $this->actionTags;
     }
 
     private function setRegEx(): void {

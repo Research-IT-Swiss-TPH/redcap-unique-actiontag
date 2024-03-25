@@ -10,7 +10,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
     private Array $params;
 
     /**
-     * ActionTags
+     * ActionTag Definitions
      * 
      */
     private $actionTagUnique = [
@@ -69,21 +69,30 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
     }
 
     private function getModuleParams() {
+        
+        //  Gather strict-unique exceptions
+        $exceptions = array();
+        $exceptions_str = $this->getProjectSetting("exceptions");
+        if(!empty($exceptions_str)) {
+            $exceptions = array_map('trim', explode(',', $exceptions_str ));
+        }
+
         $this->params = [
+            "exceptions"  => (Array) $exceptions,
             "show_debug"  => (bool) $this->getProjectSetting("javascript-debug") === true,
             "show_errors" => (bool) $this->getProjectSetting("show-errors") === true,
             "show_labels" => (bool) $this->getProjectSetting("show-labels") === true,
-            "enable_hard_check" => (bool) $this->getProjectSetting("enable-hard-check") === true
+            "hard_check"  => (bool) $this->getProjectSetting("enable-hard-check") === true
         ];
+
     }
 
-    private function getModuleData($project_id, $instrument, $record, $event_id, $instance, $survey_hash = null)
+    private function getModuleData($project_id, $instrument, $record, $event_id, $instance, $survey_hash = null) 
     {
 
         if (!class_exists("ActionTagHelper")) include_once("classes/ActionTagHelper.php");
-
         $actionTagHelper = new ActionTagHelper();
-        $actionTagHelper->addActionTag($this->actionTagUnique);
+        $actionTagHelper->define($this->actionTagUnique);
         //$actionTagHelper->addActionTag($this->actionTagTest);
 
         $this->data = $actionTagHelper->getData(null, [$instrument]);
