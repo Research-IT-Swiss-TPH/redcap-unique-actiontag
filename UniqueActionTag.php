@@ -19,7 +19,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             [
                 "name" => "strict",
                 "type" => "boolean",
-                "required" => false
+                "required" => true
             ],
             [
                 "name" => "targets",
@@ -28,7 +28,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             ],
             [
                 "name" => "title",
-                "type" => "string",
+                "type" => "number",
                 "requried" => false
             ],
             [
@@ -93,7 +93,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         if (!class_exists("ActionTagHelper")) include_once("classes/ActionTagHelper.php");
         $actionTagHelper = new ActionTagHelper();
         $actionTagHelper->define($this->actionTagUnique);
-        //$actionTagHelper->addActionTag($this->actionTagTest);
+        $actionTagHelper->define($this->actionTagTest);
 
         $this->data = $actionTagHelper->getData(null, [$instrument]);
 

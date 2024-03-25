@@ -218,8 +218,8 @@ class ActionTagHelper
                     'field' => $field["field_name"],
                     'field_type' => $field["field_type"],
                     'flat' => true,
-                    'params' => null,
-                    'errors' => null
+                    'params' => (object) [],
+                    'errors' => []
                 );
             }
         } 
@@ -227,7 +227,8 @@ class ActionTagHelper
         if($hasParamTags) {
             foreach ($matches_paramTag['actiontag'] as $i => $tag) {
 
-                $params = null;
+                $params = [];
+                $errors = [];
 
                 $matched = $matches_paramTag['params'][$i];
                 $tag = strtoupper($tag);
@@ -283,7 +284,7 @@ class ActionTagHelper
                     'field' => $field["field_name"],
                     'field_type' => $field["field_type"],
                     'flat' => false,
-                    'params' => $params,
+                    'params' => (object) $params,
                     'errors' => $errors
                 );
             }
