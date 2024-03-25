@@ -1,10 +1,10 @@
 interface Window  {
-    STPH_UAT: UniqueActionTagData
+    STPH_UAT: UATData
 }
 
-interface UniqueActionTagData {
+interface UATData {
     data: {
-        fields: {}
+        fields: Record<string, Record<string, UATTag>>
         errors: {
             not_allowed_flat: string[]
             not_allowed_multiple: string[]
@@ -17,6 +17,20 @@ interface UniqueActionTagData {
         enable_hard_check: boolean
     },
     log: Function
+}
+
+interface UATTag  {
+    errors: []
+    flat: boolean
+    params: UATParams
+    tag: string
+}
+
+interface UATParams {
+    strict: boolean
+    title: string
+    message: string
+    targets: []
 }
 
 window.STPH_UAT.log = function() {
@@ -40,4 +54,6 @@ window.STPH_UAT.log = function() {
             console.log(arguments);
     }
 }
+
+
 
