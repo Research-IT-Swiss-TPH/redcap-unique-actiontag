@@ -6,6 +6,9 @@ if (file_exists("vendor/autoload.php")) {
 
 class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
 
+    private Array $data;
+    private Array $params;
+
     /**
      * ActionTags
      * 
@@ -38,11 +41,11 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             "text", 
             "notes"
         ],
-        // allow to be sued without parameters, default=true
-        "allowFlat" => true,
-        //  allow to be used with multiple instances of same action tag on the same field
+        // allow to be used without parameters, default=true
+        "allowFlat" => false,
+        // allow to be used with multiple instances of same action tag on the same field
         "allowMultiple" => false,
-        //  allow to be used with other action tags, default=true
+        // allow to be used with other action tags, default=true
         //"allowStacking" => []  
     ];
 
@@ -59,61 +62,53 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
      */
     public function redcap_data_entry_form ( int $project_id, string $record = NULL, string $instrument, int $event_id, int $group_id = NULL, int $repeat_instance = 1 ): void
     {
-
-        $this->renderActionTags($project_id, $instrument, $record, $event_id, $repeat_instance, NULL);
-        //$this->renderJavascript();
+        $this->getModuleParams();
+        $this->getModuleData($project_id, $instrument, $record, $event_id, $repeat_instance, NULL);
+        $this->renderJavascript($record);
 
     }
 
-    private function renderActionTags($project_id, $instrument, $record, $event_id, $instance, $survey_hash = null)
+    private function getModuleParams() {
+        $this->params = [
+            "show_debug"  => (bool) $this->getProjectSetting("javascript-debug") === true,
+            "show_errors" => (bool) $this->getProjectSetting("show-errors") === true,
+            "show_labels" => (bool) $this->getProjectSetting("show-labels") === true,
+            "enable_hard_check" => (bool) $this->getProjectSetting("enable-hard-check") === true
+        ];
+    }
+
+    private function getModuleData($project_id, $instrument, $record, $event_id, $instance, $survey_hash = null)
     {
-
-        /**
-         * 1. parse ActionTag data from within FieldMetaData
-         * 2. validate ActionTags per tag (field-type, parameter-type)
-         * 3. validate ActionTags per field (combinable?)
-         * 4. pass ActionTags data to JavaScript
-         * 5. initiate JavaScript
-         * 
-         */
-
-        // $dataDictionary = REDCap::getDataDictionary($project_id, 'json', false, NULL, [$instrument]);
-        // $dataDictionaryOld = REDCap::getDataDictionary('json', false, NULL, NULL);
-
-        // if (!class_exists("ActionTagHelper_v1")) include_once("classes/ActionTagHelper_v1.php");
-        // $action_tag_results_v1 = ActionTagHelper_v1::getActionTags($this->actionTags, NULL, [$instrument]);
-
-        // if (!class_exists("ActionTagHelper_v2")) include_once("classes/ActionTagHelper_v2.php");
-        // $action_tag_results_v2 = ActionTagHelper_v2::getActionTags($this->actionTags, NULL, [$instrument]);
-
-        // if (!class_exists("ActionTagHelper_v3")) include_once("classes/ActionTagHelper_v3.php");
-        // $action_tag_results_v3 = ActionTagHelper_v3::getActionTags($this->actionTags, NULL, [$instrument]);
-
-        // if (!class_exists("ActionTagHelper_v3")) include_once("classes/ActionTagHelper_v3.php");
-        // $action_tag_results_v3 = ActionTagHelper_v3::getActionTags($this->typedActionTags, NULL, [$instrument]);
-
-        // dump($action_tag_results_v1);
-        // dump($action_tag_results_v2);
-        // dump($action_tag_results_v3);
 
         if (!class_exists("ActionTagHelper")) include_once("classes/ActionTagHelper.php");
 
         $actionTagHelper = new ActionTagHelper();
         $actionTagHelper->addActionTag($this->actionTagUnique);
-        $actionTagHelper->addActionTag($this->actionTagTest);
+        //$actionTagHelper->addActionTag($this->actionTagTest);
 
-        $actionTagData = $actionTagHelper->getData(null, [$instrument]);
-
-        dump($actionTagData);
+        $this->data = $actionTagHelper->getData(null, [$instrument]);
 
     }
-    
-    private function renderJavascript(){
+
+    private function renderJavascript($record){
         ?>
+        <script>
+            /**
+             * Store module data into global context so that accessing through modern JavaScript (TypeScript) is possible
+             * 
+             * In a tabbed browser, each tab is represented by its own Window object; 
+             * https://developer.mozilla.org/en-US/docs/Web/API/Window
+             * 
+             */
+            window.STPH_UAT = {
+                data: <?= json_encode($this->data) ?>,
+                params: <?= json_encode($this->params) ?>,      
+            }
+        </script>        
         <script 
             type="module"  
             src="<?php print $this->getUrl('dist/unique.js'); ?>">
-        </script>
+        </script>  
         <?php
     }
 

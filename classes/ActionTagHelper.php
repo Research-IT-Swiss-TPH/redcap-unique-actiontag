@@ -146,7 +146,7 @@ class ActionTagHelper
 
     private function validate(): void {
 
-        dump($this->parsedData);
+        //dump($this->parsedData);
 
         $validated = [];
         $errors = [
@@ -170,7 +170,6 @@ class ActionTagHelper
             //  check allowFlat
             if($flat && !$this->actionTags[$tag]["allowFlat"]) {
                 $errors["not_allowed_flat"][] = $tag;
-                dump("flat rule triggered");
             }
             //  check allowMultiple per field
             if(!$this->actionTags[$tag]["allow_multiple"] && isset($validated[$field][$tag])) {
