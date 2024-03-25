@@ -152,38 +152,39 @@ class ActionTagHelper
         ];
         foreach ($this->parsedData as $key => $data) {
 
-            $tag = $data["tag"];
-            $flat = $data["flat"];
-            $field = $data["field"];
+            $hasErrors = false;
 
-            //  check if already occuring within errors
-            if( $flat && is_array($errors["not_allowed_flat"]) && in_array($tag, $errors["not_allowed_flat"])) continue;
+            $tag    = $data["tag"];
+            $flat   = $data["flat"];
+            $field  = $data["field"];
+            $fieldParams = $data["params"];
+            $fieldErrors = $data["errors"];
 
-            if(is_array($errors["not_allowed_multiple"][$tag]) && in_array($field, $errors["not_allowed_multiple"][$tag])) continue;
-
-            // if(is_array($errors["not_allowed_stacking"][$tag]) && in_array($field, $errors["not_allowed_stacking"][$tag])) continue;
-
-            //  check allowFlat
-            if($flat && !$this->actionTags[$tag]["allowFlat"]) {
-                $errors["not_allowed_flat"][] = $tag;
+            //  check allowFlat per field
+            if($flat && !$this->actionTags[$tag]["allowFlat"] && !in_array($field, $errors["not_allowed_flat"][$tag] ?? [])) {
+                $errors["not_allowed_flat"][$tag][] = $field;
+                $hasErrors = true;
             }
+
             //  check allowMultiple per field
-            if(!$this->actionTags[$tag]["allow_multiple"] && isset($validated[$field][$tag])) {
+            if(!$this->actionTags[$tag]["allow_multiple"] && isset($validated[$field][$tag]) && !in_array($field, $errors["not_allowed_multiple"][$tag] ?? [])) {
                 $errors["not_allowed_multiple"][$tag][] = $field;
+
                 unset($validated[$field][$tag]);
                 if(count($validated[$field]) === 0) unset($validated[$field]);
-                continue;
-            }
-            
-            //  check allowStacking per field
-            //  tbd
 
-            $validated[$field][$tag] = array(
-                "tag"    => $tag,
-                "flat"   => $flat,
-                "params" => $data["params"],
-                "errors" => $data["errors"]
-            );
+                $hasErrors = true;
+            }
+
+
+            if($hasErrors === false) {
+                $validated[$field][$tag] = array(
+                    "tag"    => $tag,
+                    "flat"   => $flat,
+                    "params" => $fieldParams,
+                    "errors" => $fieldErrors
+                );
+            }
 
         }
 

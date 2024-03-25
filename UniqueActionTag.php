@@ -42,7 +42,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             "notes"
         ],
         // allow to be used without parameters, default=true
-        "allowFlat" => false,
+        "allowFlat" => true,
         // allow to be used with multiple instances of same action tag on the same field
         "allowMultiple" => false,
         // allow to be used with other action tags, default=true
@@ -117,7 +117,14 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         <script 
             type="module"  
             src="<?php print $this->getUrl('dist/unique.js'); ?>">
-        </script>  
+        </script>
+        <script>
+            $(function() {
+                $(document).ready(function(){
+                    window.STPH_UAT.init();
+                })
+            });
+        </script>
         <?php
     }
 
