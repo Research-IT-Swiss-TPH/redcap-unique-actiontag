@@ -19,3 +19,7 @@ window.STPH_UAT.log = function () {
             console.log(arguments);
     }
 };
+window.STPH_UAT.init = function () {
+    this.log(this.data);
+};
+window.STPH_UAT.init();
