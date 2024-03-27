@@ -1,12 +1,14 @@
-// declare global {
-//     interface Window {
-//         STPH_UAT: UAT_Module
-//     }
-// }
+export {};  //  indicate that the file is a module
 
+/**
+ * properly type window with our global UAT object
+ * https://www.totaltypescript.com/how-to-properly-type-window
+ */
+declare global {
     interface Window {
-        STPH_UAT: UAT_Module
+        STPH_UAT_DTO: UAT_Module
     }
+}
 
 interface UAT_Module {
     data: UAT_Data
@@ -50,6 +52,9 @@ interface UAT_Params {
     enable_hard_check: boolean
 }
 
+//  Deep clone DTO by value into local variable
+let STPH_UAT: UAT_Module = JSON.parse(JSON.stringify(window.STPH_UAT_DTO))
+
 class UniqueActionTag {
 
     private ob
@@ -65,7 +70,7 @@ class UniqueActionTag {
     }
 
     writeLabels(){
-        if(!window.STPH_UAT.params.show_labels) return
+        if(!STPH_UAT.params.show_labels) return
         let label = $('#label-'+this.data.field+' tr').find('td:first');
         label.html('<p>'+label.text() + '</p><p style="font-weight:100;font-size:12px;">('+this.data.tag+')</p>')
     }
@@ -77,7 +82,8 @@ class UniqueActionTag {
 
 }
 
-window.STPH_UAT.log = function() {
+
+STPH_UAT.log = function() {
 
     if(!this.params.show_debug) return;
 
@@ -99,24 +105,24 @@ window.STPH_UAT.log = function() {
     }
 }
 
-window.STPH_UAT.init = function() {
+STPH_UAT.init = function() {
     console.log(this.data)
     this.writeGlobalErrors()
 
     // Loop over all fields and tags, and create a new class for each
-    Object.keys(window.STPH_UAT.data.fields).forEach(function(field) {
+    Object.keys(this.data.fields).forEach((field)=> {
         //console.log(field)
-        Object.keys(window.STPH_UAT.data.fields[field]).forEach(function(tagname){
+        Object.keys(this.data.fields[field]).forEach((tagname)=>{
             //console.log(tagname)
-            let data = window.STPH_UAT.data.fields[field][tagname]
+            let data = this.data.fields[field][tagname]
             new UniqueActionTag(data).init()
         })
         
     })
 }
 
-window.STPH_UAT.writeGlobalErrors = function() {
-    if( window.STPH_UAT.data.errors.not_allowed_flat.length > 0 || window.STPH_UAT.data.errors.not_allowed_multiple.length > 0) {
+STPH_UAT.writeGlobalErrors = function() {
+    if( this.data.errors.not_allowed_flat.length > 0 || this.data.errors.not_allowed_multiple.length > 0) {
         $('#dataEntryTopOptions')
         .append('<div class="alert alert-warning"><b>Unique Action Tag - External Module</b><br>Errors detected!</div>')
         Object.keys(this.data.errors).forEach(error => {
@@ -128,3 +134,8 @@ window.STPH_UAT.writeGlobalErrors = function() {
 
 
 
+$(function() {
+    $(document).ready(function(){
+        STPH_UAT.init();
+    })
+});

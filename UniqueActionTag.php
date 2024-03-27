@@ -8,6 +8,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
 
     private Array $data;
     private Array $params;
+    private Array $DTO;
 
     /**
      * ActionTag Definitions
@@ -64,6 +65,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
     {
         $this->getModuleParams();
         $this->getModuleData($project_id, $instrument, $record, $event_id, $repeat_instance, NULL);
+        $this->getDataTransferObject();
         $this->renderJavascript($record);
 
     }
@@ -99,6 +101,13 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
 
     }
 
+    private function getDataTransferObject() {
+        $this->DTO = array(
+            "data" => $this->data,
+            "params" => $this->params
+        );
+    }
+
     private function renderJavascript($record){
         ?>
         <script>
@@ -109,21 +118,12 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
              * https://developer.mozilla.org/en-US/docs/Web/API/Window
              * 
              */
-            window.STPH_UAT = {
-                data: <?= json_encode($this->data) ?>,
-                params: <?= json_encode($this->params) ?>,      
-            }
-        </script>        
+            window.STPH_UAT_DTO = <?= json_encode($this->DTO) ?>
+
+        </script>
         <script 
             type="module"  
             src="<?php print $this->getUrl('dist/unique.js'); ?>">
-        </script>
-        <script>
-            $(function() {
-                $(document).ready(function(){
-                    window.STPH_UAT.init();
-                })
-            });
         </script>
         <?php
     }
