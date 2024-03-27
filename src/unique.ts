@@ -1,29 +1,22 @@
 export {};  //  indicate that the file is a module
 
 /**
- * properly type window with our global UAT object
+ * properly type-extend window with our global UAT Data Transfer Object
  * https://www.totaltypescript.com/how-to-properly-type-window
  */
 declare global {
     interface Window {
-        STPH_UAT_DTO: UAT_Module
+        DTO_STPH_UAT: UAT_Module
     }
 }
 
 interface UAT_Module {
-    data: UAT_Data
+    data: Record<string, Record<string, UAT_Tag>>
     params: UAT_Params,
+    errors: Record<string, string[]>
     log: Function
     init: Function,
     writeGlobalErrors: Function
-}
-
-interface UAT_Data {
-    fields: Record<string, Record<string, UAT_Tag>>
-    errors: {
-        not_allowed_flat: string[]
-        not_allowed_multiple: string[]
-    }
 }
 
 interface UAT_Tag  {
@@ -53,7 +46,7 @@ interface UAT_Params {
 }
 
 //  Deep clone DTO by value into local variable
-let STPH_UAT: UAT_Module = JSON.parse(JSON.stringify(window.STPH_UAT_DTO))
+let STPH_UAT: UAT_Module = JSON.parse(JSON.stringify(window.DTO_STPH_UAT))
 
 class UniqueActionTag {
 
@@ -110,11 +103,11 @@ STPH_UAT.init = function() {
     this.writeGlobalErrors()
 
     // Loop over all fields and tags, and create a new class for each
-    Object.keys(this.data.fields).forEach((field)=> {
+    Object.keys(this.data).forEach((field)=> {
         //console.log(field)
-        Object.keys(this.data.fields[field]).forEach((tagname)=>{
+        Object.keys(this.data[field]).forEach((tagname)=>{
             //console.log(tagname)
-            let data = this.data.fields[field][tagname]
+            let data = this.data[field][tagname]
             new UniqueActionTag(data).init()
         })
         
@@ -122,20 +115,15 @@ STPH_UAT.init = function() {
 }
 
 STPH_UAT.writeGlobalErrors = function() {
-    if( this.data.errors.not_allowed_flat.length > 0 || this.data.errors.not_allowed_multiple.length > 0) {
+    if( this.errors.not_allowed_flat.length > 0 || this.errors.not_allowed_multiple.length > 0) {
         $('#dataEntryTopOptions')
         .append('<div class="alert alert-warning"><b>Unique Action Tag - External Module</b><br>Errors detected!</div>')
-        Object.keys(this.data.errors).forEach(error => {
+        Object.keys(this.errors).forEach(error => {
             console.log(error)
         });
     }
 }
 
 
-
-
-$(function() {
-    $(document).ready(function(){
-        STPH_UAT.init();
-    })
-});
+//  Initiate the script
+STPH_UAT.init();

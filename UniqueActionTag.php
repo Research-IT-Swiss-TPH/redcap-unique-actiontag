@@ -7,6 +7,7 @@ if (file_exists("vendor/autoload.php")) {
 class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
 
     private Array $data;
+    private Array $errors;
     private Array $params;
     private Array $DTO;
 
@@ -97,13 +98,14 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         $actionTagHelper->define($this->actionTagUnique);
         $actionTagHelper->define($this->actionTagTest);
 
-        $this->data = $actionTagHelper->getData(null, [$instrument]);
+        list($this->data, $this->errors) = $actionTagHelper->getData(null, [$instrument]);
 
     }
 
     private function getDataTransferObject() {
         $this->DTO = array(
             "data" => $this->data,
+            "errors" => $this->errors,
             "params" => $this->params
         );
     }
@@ -117,9 +119,8 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
              * In a tabbed browser, each tab is represented by its own Window object; 
              * https://developer.mozilla.org/en-US/docs/Web/API/Window
              * 
-             */
-            window.STPH_UAT_DTO = <?= json_encode($this->DTO) ?>
-
+             */            
+            window.DTO_STPH_UAT = <?= json_encode($this->DTO) ?>
         </script>
         <script 
             type="module"  

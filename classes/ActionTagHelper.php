@@ -183,8 +183,8 @@ class ActionTagHelper
         }
 
         $this->actionTagData = array(
-            'fields' => $validated,
-            'errors' => $errors 
+            $validated,
+            $errors 
         );
 
     }

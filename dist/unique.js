@@ -1,4 +1,4 @@
-let STPH_UAT = JSON.parse(JSON.stringify(window.STPH_UAT_DTO));
+let STPH_UAT = JSON.parse(JSON.stringify(window.DTO_STPH_UAT));
 class UniqueActionTag {
     constructor(data) {
         this.data = data;
@@ -42,25 +42,21 @@ STPH_UAT.log = function () {
 STPH_UAT.init = function () {
     console.log(this.data);
     this.writeGlobalErrors();
-    Object.keys(this.data.fields).forEach((field) => {
-        Object.keys(this.data.fields[field]).forEach((tagname) => {
-            let data = this.data.fields[field][tagname];
+    Object.keys(this.data).forEach((field) => {
+        Object.keys(this.data[field]).forEach((tagname) => {
+            let data = this.data[field][tagname];
             new UniqueActionTag(data).init();
         });
     });
 };
 STPH_UAT.writeGlobalErrors = function () {
-    if (this.data.errors.not_allowed_flat.length > 0 || this.data.errors.not_allowed_multiple.length > 0) {
+    if (this.errors.not_allowed_flat.length > 0 || this.errors.not_allowed_multiple.length > 0) {
         $('#dataEntryTopOptions')
             .append('<div class="alert alert-warning"><b>Unique Action Tag - External Module</b><br>Errors detected!</div>');
-        Object.keys(this.data.errors).forEach(error => {
+        Object.keys(this.errors).forEach(error => {
             console.log(error);
         });
     }
 };
-$(function () {
-    $(document).ready(function () {
-        STPH_UAT.init();
-    });
-});
+STPH_UAT.init();
 export {};
