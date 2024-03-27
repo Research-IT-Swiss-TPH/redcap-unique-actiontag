@@ -262,12 +262,12 @@ class ActionTagHelper
 
                             //  Check for required params
                             if($value["required"] && !isset($decoded_params[$value["name"]])) {
-                                $errors["param_missing_required"] = "param '" . $value["name"] . "' is required";
+                                $errors["param_missing_required"][] = "param '" . $value["name"] . "' is required";
                             }
 
                             //  Check param value types
                             else if( isset($decoded_params[$value["name"]]) && gettype($decoded_params[$value["name"]]) !== $value["type"] ) {
-                                $errors["param_wrong_type"] = "param '" . $value["name"] . "' must be of type '" . $value["type"] . "'";
+                                $errors["param_wrong_type"][] = "param '" . $value["name"] . "' must be of type '" . $value["type"] . "'";
                             }
                         
                             //  add to params if is valid

@@ -1,13 +1,19 @@
-interface Window  {
-    STPH_UAT: UAT_Module
-}
+// declare global {
+//     interface Window {
+//         STPH_UAT: UAT_Module
+//     }
+// }
+
+    interface Window {
+        STPH_UAT: UAT_Module
+    }
 
 interface UAT_Module {
     data: UAT_Data
     params: UAT_Params,
     log: Function
     init: Function,
-    writeErrors: Function
+    writeGlobalErrors: Function
 }
 
 interface UAT_Data {
@@ -19,7 +25,7 @@ interface UAT_Data {
 }
 
 interface UAT_Tag  {
-    errors: []
+    errors: UAT_TagErrors
     flat: boolean
     params: {
         strict: boolean
@@ -32,11 +38,43 @@ interface UAT_Tag  {
     field_type: string
 }
 
+interface UAT_TagErrors {
+    param_missing_required?: string[]
+    param_wrong_type?: string[]
+}
+
 interface UAT_Params {
     show_debug: boolean,
     show_erors: boolean,
     show_labels: boolean,
     enable_hard_check: boolean
+}
+
+class UniqueActionTag {
+
+    private ob
+
+    constructor(private data:UAT_Tag) {
+        this.data = data
+        this.ob = document.getElementsByName(this.data.field)[0]
+    }
+
+    init(){
+        this.writeLabels()
+        this.writeTagErrors()
+    }
+
+    writeLabels(){
+        if(!window.STPH_UAT.params.show_labels) return
+        let label = $('#label-'+this.data.field+' tr').find('td:first');
+        label.html('<p>'+label.text() + '</p><p style="font-weight:100;font-size:12px;">('+this.data.tag+')</p>')
+    }
+
+
+    writeTagErrors(){
+        console.log(this.data.errors)
+    }
+
 }
 
 window.STPH_UAT.log = function() {
@@ -63,7 +101,7 @@ window.STPH_UAT.log = function() {
 
 window.STPH_UAT.init = function() {
     console.log(this.data)
-    this.writeErrors()
+    this.writeGlobalErrors()
 
     // Loop over all fields and tags, and create a new class for each
     Object.keys(window.STPH_UAT.data.fields).forEach(function(field) {
@@ -77,7 +115,7 @@ window.STPH_UAT.init = function() {
     })
 }
 
-window.STPH_UAT.writeErrors = function() {
+window.STPH_UAT.writeGlobalErrors = function() {
     if( window.STPH_UAT.data.errors.not_allowed_flat.length > 0 || window.STPH_UAT.data.errors.not_allowed_multiple.length > 0) {
         $('#dataEntryTopOptions')
         .append('<div class="alert alert-warning"><b>Unique Action Tag - External Module</b><br>Errors detected!</div>')
@@ -88,32 +126,5 @@ window.STPH_UAT.writeErrors = function() {
 }
 
 
-class UniqueActionTag {
 
-    private ob
-
-    constructor(private data:UAT_Tag) {
-        this.data = data
-        this.ob = document.getElementsByName(this.data.field)[0]
-    }
-
-    init(){
-        this.writeLabels()
-        this.writeErrors()
-    }
-
-    writeLabels(){
-        if(!window.STPH_UAT.params.show_labels) return
-        let label = $('#label-'+this.data.field+' tr').find('td:first');
-        label.html('<p>'+label.text() + '</p><p style="font-weight:100;font-size:12px;">('+this.data.tag+')</p>')
-    }
-
-
-    writeErrors(){
-        if(this.data.errors.length <= 0) return
-        
-
-    }
-
-}
 
