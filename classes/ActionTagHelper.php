@@ -261,7 +261,7 @@ class ActionTagHelper
                         foreach ($atParams as $key => $value) {
 
                             //  Check for required params
-                            if($value["required"] && !isset($decoded_params[$value["name"]])) {
+                            if(isset($value["required"]) && $value["required"] && !isset($decoded_params[$value["name"]])) {
                                 $errors["param_missing_required"][] = "param '" . $value["name"] . "' is required";
                             }
 
@@ -274,6 +274,12 @@ class ActionTagHelper
                             else if( isset($decoded_params[$value["name"]]) && gettype($decoded_params[$value["name"]]) === $value["type"] ) {
                                 $params[$value["name"]] = $decoded_params[$value["name"]];
                             }
+
+                            //  use default value if decoded value is not set and is not required and has a default value
+                            else if( isset($value["required"]) && !$value["required"] && isset($value["default"]) && !isset($decoded_params[$value["name"]])) {
+                                $params[$value["name"]] = $value["default"];
+                            }
+
                         }
                     }
                     

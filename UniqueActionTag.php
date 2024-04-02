@@ -21,8 +21,27 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             [
                 "name" => "strict",
                 "type" => "boolean",
+                "default" => false,
                 "required" => true
             ],
+            [
+                "name" => "ignore_instance",
+                "type" => "boolean",
+                "default" => false,
+                "required" => false
+            ],
+            [
+                "name" => "ignore_event",
+                "type" => "boolean",
+                "default" => false,
+                "required" => false
+            ],
+            [
+                "name" => "ignore_arm",
+                "type" => "boolean",
+                "default" => false,
+                "required" => false
+            ],  
             [
                 "name" => "targets",
                 "type" => "array",
@@ -68,6 +87,8 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         $this->getModuleData($project_id, $instrument, $record, $event_id, $repeat_instance, NULL);
         $this->getDataTransferObject();
         $this->renderJavascript($record);
+
+        dump($this->DTO);
 
     }
 
