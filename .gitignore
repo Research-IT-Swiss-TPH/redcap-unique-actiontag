@@ -2,3 +2,4 @@
 *.lock
 /classes/*_v*.php
 node_modules
+*.cache

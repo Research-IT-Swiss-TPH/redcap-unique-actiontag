@@ -85,10 +85,10 @@ class ActionTagHelper
      )/x";
 
 
-    public function __construct(Array $actionTags = []) {
+    public function __construct() {
         $this->actionTagData = [];
-        $this->actionTags = $actionTags;
-        $this->setRegEx();
+        //$this->actionTags = $actionTags;
+        //$this->setRegEx();
     }
 
     public function define(Array $actiontag): void {
@@ -96,6 +96,10 @@ class ActionTagHelper
         unset($actiontag["tag"]);
         $this->actionTags[$title] = $actiontag;
         $this->setRegEx();
+    }
+
+    public function getActionTags() {
+        return $this->actionTags;
     }
 
     private function setRegEx(): void {
@@ -218,7 +222,7 @@ class ActionTagHelper
                     'field' => $field["field_name"],
                     'field_type' => $field["field_type"],
                     'flat' => true,
-                    'params' => (object) [],
+                    'params' => [],
                     'errors' => []
                 );
             }
@@ -290,7 +294,7 @@ class ActionTagHelper
                     'field' => $field["field_name"],
                     'field_type' => $field["field_type"],
                     'flat' => false,
-                    'params' => (object) $params,
+                    'params' => $params,
                     'errors' => $errors
                 );
             }

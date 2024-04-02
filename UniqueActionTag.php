@@ -88,8 +88,6 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         $this->getDataTransferObject();
         $this->renderJavascript($record);
 
-        dump($this->DTO);
-
     }
 
     private function getModuleParams() {

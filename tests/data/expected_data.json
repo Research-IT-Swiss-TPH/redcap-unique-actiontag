@@ -1,0 +1,58 @@
+[
+  {
+    "field_1": {
+      "@AT1": {
+        "tag": "@AT1",
+        "field": "field_1",
+        "field_type": "text",
+        "flat": true,
+        "params": [],
+        "errors": []
+      }
+    },
+    "field_3": {
+      "@AT1": {
+        "tag": "@AT1",
+        "field": "field_3",
+        "field_type": "text",
+        "flat": false,
+        "params": {
+          "foo": "bar"
+        },
+        "errors": []
+      }
+    },
+    "field_5": {
+      "@AT2": {
+        "tag": "@AT2",
+        "field": "field_5",
+        "field_type": "text",
+        "flat": false,
+        "params": {
+          "foo": [
+            "bar_1",
+            "bar_2"
+          ],
+          "goo": "La la la",
+          "hoo": true
+        },
+        "errors": []
+      }
+    }
+  },
+  {
+    "not_allowed_flat": {
+      "@AT2": [
+        "field_4"
+      ]
+    },
+    "not_allowed_multiple": {
+      "@AT1": [
+        "field_2"
+      ],
+      "@AT2": [
+        "field_4"
+      ]
+    }
+  }
+]

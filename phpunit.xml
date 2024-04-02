@@ -1,0 +1,5 @@
+<testsuites>
+    <testsuite name="UniqueActionTag">
+        <directory >./tests/</directory>
+    </testsuite>
+</testsuites>
