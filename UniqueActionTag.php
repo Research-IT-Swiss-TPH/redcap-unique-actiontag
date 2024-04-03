@@ -22,7 +22,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                 "name" => "strict",
                 "type" => "boolean",
                 "default" => false,
-                "required" => true
+                "required" => false
             ],
             [
                 "name" => "ignore_instance",
@@ -59,8 +59,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             ]
         ],
         "allowed_field_types" => [
-            "text", 
-            "notes"
+            "text"
         ],
         // allow to be used without parameters, default=true
         "allowFlat" => true,
@@ -86,6 +85,8 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         $this->getModuleParams();
         $this->getModuleData($project_id, $instrument, $record, $event_id, $repeat_instance, NULL);
         $this->getDataTransferObject();
+        $this->renderStyles();
+        $this->initializeJavascriptModuleObject();
         $this->renderJavascript($record);
 
     }
@@ -115,7 +116,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         if (!class_exists("ActionTagHelper")) include_once("classes/ActionTagHelper.php");
         $actionTagHelper = new ActionTagHelper();
         $actionTagHelper->define($this->actionTagUnique);
-        $actionTagHelper->define($this->actionTagTest);
+        //$actionTagHelper->define($this->actionTagTest);
 
         list($this->data, $this->errors) = $actionTagHelper->getData(null, [$instrument]);
 
@@ -129,6 +130,12 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         );
     }
 
+    private function renderStyles() {
+        ?>
+            <link rel="stylesheet" href="<?= $this->getUrl('css/style.css')?>">
+        <?php
+    }
+
     private function renderJavascript($record){
         ?>
         <script>
@@ -138,8 +145,9 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
              * In a tabbed browser, each tab is represented by its own Window object; 
              * https://developer.mozilla.org/en-US/docs/Web/API/Window
              * 
-             */            
-            window.DTO_STPH_UAT = <?= json_encode($this->DTO) ?>
+             */
+            const JSO_STPH_UAT = <?=$this->getJavascriptModuleObjectName()?>;
+            const DTO_STPH_UAT = <?= json_encode($this->DTO) ?>;
         </script>
         <script 
             type="module"  
