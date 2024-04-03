@@ -1,9 +1,11 @@
 # Unique Action Tag
 
 A REDCap external module providing action tags that render fields unique with custom conditions.
-Version 2 has been rewritten from scratch and reduces all ActionTags to a single one with an extended API.
+The External Module version 3 has been rewritten from scratch and reduces all ActionTags to a single one with an extended API.
 
-The default behaviour of the @UNIQUE Action Tag is:
+*Warning:* If you are upgrading from version 2 to version 3 there are breaking changes in the way the ActionTag is beeing used. Please ensure you migrate accordingly to the new @UNIQUE API.
+
+The **new** default behaviour of the @UNIQUE Action Tag is:
 
 - check uniqueness against all records
 - check uniqueness against all instances
@@ -18,13 +20,12 @@ Additional customizations can be configured with:
 - check uniqueness against additional fields with `targets`:
 `"tartgets": ["field_1", "field_2"]`
 
-- define custom dialog with `tittle` and `message`:
+- define custom dialog with `title` and `message`:
 `"title": "This is a title"`
 `"message": "This is a message."`
 
 
 The "ignore_" flags can be used to disable checks against instances, events or arms.
-
 
 Example 1: Checks uniqueness across records, instances, events and arms. Since all options have defaults values, it is not necessary to supply them always.
 
