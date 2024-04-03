@@ -9,7 +9,11 @@ use \ExternalModules\ModuleBaseTest;
 abstract class BaseTest extends ModuleBaseTest {
 
     public String $rndm;
-    public static $TestPIDs;
+    public static $testPIDs;
+
+    public static $TEST_PID_1;
+    public static $TEST_PID_2;
+    public static $TEST_PID_3;
 
     public function __construct() {        
         
@@ -25,7 +29,10 @@ abstract class BaseTest extends ModuleBaseTest {
     static function setUpBeforeClass(): void
     {
         self::resetTestProjects();
-        self::$TestPIDs = ExternalModules::getTestPIDs();
+        self::$testPIDs = ExternalModules::getTestPIDs();
+        self::$TEST_PID_1 = self::$testPIDs[0];
+        self::$TEST_PID_2 = self::$testPIDs[1];
+        self::$TEST_PID_3 = self::$testPIDs[2];
     }
 
     /**
@@ -101,6 +108,10 @@ abstract class BaseTest extends ModuleBaseTest {
 
     }    
 
+    /**
+     * Writes into console
+     * 
+     */
     protected static function echo($message)
     {
         // if output buffer has not started yet
@@ -115,7 +126,7 @@ abstract class BaseTest extends ModuleBaseTest {
         }
 
         // echo to output
-        echo "\033[01;31m" . $message . "\033[0m";
+        echo "\033[01;33m" . $message . "\033[0m";
 
         // flush current buffer to output stream
         ob_flush();

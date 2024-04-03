@@ -90,16 +90,19 @@ class ActionTagHelperTest extends BaseTest {
         "allowMultiple" => false,
     ];
 
-
+    /**
+     * Helper function to generate form_name from form_label
+     * Taken from ProjectDesigner Class (it would be good if REDCap Core offers this as a default)
+     * 
+     */
     private function getFormName($form_label) {
         return preg_replace("/[^a-z_0-9]/", "", str_replace(" ", "_", strtolower($form_label)));
     }
 
-    //  design project: form 1 field 1, field 2, field 3 (text)
-    //  add actiontags: @UNIQUE={..} to field meta data
-    //  call define/get
-    //  call getData
-
+    /**
+     * Test Define ActionTags
+     * 
+     */
     function test_define_actiontags() {
 
         $actionTagHelper = new ActionTagHelper();
@@ -109,15 +112,16 @@ class ActionTagHelperTest extends BaseTest {
         $this->assertCount(2, $actionTagHelper->getActionTags());
     }
 
-
+    /**
+     * Test GetData ActionTag
+     * 
+     */
     function test_getdata_actiontag() {
-
-        //  Set project id constant to first Testing Project ID
-        //define('PROJECT_ID', ExternalModules::getTestPIDs()[0]);
 
         $form_label = "Form " . $this->rndm;
 
-        $Proj = new Project(self::$TestPIDs[0]);
+        $project_id = self::$TEST_PID_1;
+        $Proj = new Project($project_id);
         $projectDesigner = new ProjectDesigner($Proj);
 
         //  Create form
