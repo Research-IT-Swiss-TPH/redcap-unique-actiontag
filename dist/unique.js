@@ -1,36 +1,46 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 class UniqueActionTag {
     constructor(data) {
         this.data = data;
         this.data = data;
         this.ob = document.getElementsByName(this.data.field)[0];
+        this.value = this.ob.value;
     }
     init() {
         this.writeLabels();
         this.initiateFields();
         this.writeTagErrors();
-        this.checkUnique();
+        this.checkOnLoad();
     }
     writeLabels() {
         if (!DTO_STPH_UAT.params.show_labels)
             return;
         let label = $('#label-' + this.data.field + ' tr').find('td:first');
-        label.append('<p style="font-weight:100;font-size:12px;">(' + this.data.tag + ')</p>');
+        let emlabel = '<p style="font-weight:100;font-size:12px;"><i class="fa-solid fa-cube text-info me-2"></i><small>This field is modified by <b>Unique Action Tag</b></small></p>';
+        label.append(emlabel);
     }
     initiateFields() {
         this.ob.classList.add('form-control');
         let divLoadingHelp = '<div class="loadingHelp form-text">checking for uniqueness...</div>';
         let divValidFeedback = '<div class="valid-feedback">Field is unique.</div>';
         let divInvalidFeedback = '<div class="invalid-feedback">Field is not unique.</div>';
-        $(this.ob).parent().append(divLoadingHelp);
-        $(this.ob).parent().append(divValidFeedback);
-        $(this.ob).parent().append(divInvalidFeedback);
+        $(this.ob).parent().append(divLoadingHelp + divValidFeedback + divInvalidFeedback);
     }
     writeTagErrors() {
     }
-    checkUnique() {
-        if (this.ob.value.length === 0)
+    checkOnLoad() {
+        if (this.value.length === 0)
             return;
         this.renderUI('start-load');
+        this.ajax_check_unique();
     }
     renderUI(phase) {
         switch (phase) {
@@ -40,9 +50,19 @@ class UniqueActionTag {
                 $(this.ob).prop("disabled", true);
                 break;
             default:
-                DTO_STPH_UAT.log("Invalid phase in toggle UI.");
+                DTO_STPH_UAT.log("Invalid phase.");
                 break;
         }
+    }
+    ajax_check_unique() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const response = yield JSO_STPH_UAT.ajax('check-unique', this.data);
+            }
+            catch (error) {
+                console.log(error);
+            }
+        });
     }
 }
 DTO_STPH_UAT.log = function () {

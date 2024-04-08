@@ -140,10 +140,9 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         ?>
         <script>
             /**
-             * Store module data into global context so that accessing through modern JavaScript (TypeScript) is possible
-             * 
-             * In a tabbed browser, each tab is represented by its own Window object; 
-             * https://developer.mozilla.org/en-US/docs/Web/API/Window
+             * Passthrough:
+             * JavascriptModuleObject JS(M)O
+             * Data Transfer Object DTO
              * 
              */
             const JSO_STPH_UAT = <?=$this->getJavascriptModuleObjectName()?>;

@@ -42,23 +42,31 @@ interface UAT_Params {
 class UniqueActionTag {
 
     private ob
+    private value
 
     constructor(private data:UAT_Tag) {
         this.data = data
         this.ob = document.getElementsByName(this.data.field)[0] as HTMLInputElement
+        this.value = this.ob.value
     }
 
     init(){
         this.writeLabels()
         this.initiateFields()
         this.writeTagErrors()
-        this.checkUnique()
+        this.checkOnLoad()
     }
 
     writeLabels(){
         if(!DTO_STPH_UAT.params.show_labels) return
+
         let label = $('#label-'+this.data.field+' tr').find('td:first');
-        label.append('<p style="font-weight:100;font-size:12px;">('+this.data.tag+')</p>')
+
+        // tbd: move to global context so that this label is only written once.
+        let emlabel = '<p style="font-weight:100;font-size:12px;"><i class="fa-solid fa-cube text-info me-2"></i><small>This field is modified by <b>Unique Action Tag</b></small></p>';
+        label.append(emlabel);
+
+        //label.append('<p style="font-weight:100;font-size:12px;">('+this.data.tag+')</p>')    // this is tag specific label and my be added
     }
 
     initiateFields() {
@@ -66,9 +74,8 @@ class UniqueActionTag {
         let divLoadingHelp = '<div class="loadingHelp form-text">checking for uniqueness...</div>'
         let divValidFeedback = '<div class="valid-feedback">Field is unique.</div>'
         let divInvalidFeedback = '<div class="invalid-feedback">Field is not unique.</div>'
-        $(this.ob).parent().append(divLoadingHelp)
-        $(this.ob).parent().append(divValidFeedback)
-        $(this.ob).parent().append(divInvalidFeedback)
+
+        $(this.ob).parent().append(divLoadingHelp + divValidFeedback + divInvalidFeedback)
     }
 
 
@@ -76,11 +83,12 @@ class UniqueActionTag {
         //console.log(this.data.errors)
     }
 
-    checkUnique() {
+    checkOnLoad() {
         //  skip empty values
-        if(this.ob.value.length === 0) return
+        if(this.value.length === 0) return
 
         this.renderUI('start-load')
+        this.ajax_check_unique()
     }
 
     renderUI(phase: String) {
@@ -93,13 +101,19 @@ class UniqueActionTag {
                 break;
             
             default:
-                DTO_STPH_UAT.log("Invalid phase in toggle UI.")
+                DTO_STPH_UAT.log("Invalid phase.")
                 break;
         }
     }
 
+    async ajax_check_unique() {
+        try {
+            const response  = await JSO_STPH_UAT.ajax('check-unique', this.data)
 
-
+        } catch (error) {
+            console.log(error)
+        }
+    }
 }
 
 DTO_STPH_UAT.log = function() {
