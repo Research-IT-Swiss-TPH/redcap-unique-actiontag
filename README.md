@@ -9,27 +9,33 @@ The **new** default behaviour of the @UNIQUE Action Tag is:
 
 - check uniqueness against all records except current record
 - check uniqueness against current instance
-- check uniqueness against current events
+- check uniqueness against current event
 
 
 The "with_" flags can be used to enable complete checks against all records , instances or events:
 - check uniqueness against all records inlcuding current record, `with_all_records`:
+
 `"with_all_records":true`
 
 - check uniqueness against all instances, `with_all_instances`:
+
 `"with_all_instances":true`
 
 - check uniqueness against all events, `with_all_events`:
+
 `"with_all_events":true`
 
 
 Additional customizations can be configured with:
 
 - check uniqueness against additional fields with `targets`:
+
 `"targets": ["field_1", "field_2"]`
 
 - define custom dialog with `title` and `message`:
+
 `"title": "This is a title"`
+
 `"message": "This is a message."`
 
 
