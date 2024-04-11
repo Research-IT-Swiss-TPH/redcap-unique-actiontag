@@ -87,6 +87,7 @@ class ActionTagHelper
 
     public function __construct() {
         $this->actionTagData = [];
+        $this->parsedData =[];
         //$this->actionTags = $actionTags;
         //$this->setRegEx();
     }
@@ -117,7 +118,7 @@ class ActionTagHelper
      * 
      */
     public function getData(Array|Null $fields = NULL, Array|Null $instruments = NULL): Array {
-        
+
         // Get the metadata with applied filters fields, instruments
         $this->getMetaData($fields, $instruments);
         $this->parseData();
@@ -150,7 +151,6 @@ class ActionTagHelper
         $errors = [
             "not_allowed_flat" => [],
             "not_allowed_multiple" => []
-            //,"not_allowed_stacking"=> []
         ];
         foreach ($this->parsedData as $key => $data) {
 
