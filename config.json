@@ -55,6 +55,9 @@
         }
      ],
 
+    "auth-ajax-actions": [ "check-unique" ],
+
+
      "compatibility": {
         "php-version-min": "8.0.0"
       }
