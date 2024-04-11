@@ -17,10 +17,14 @@ interface UAT_Tag  {
     errors: UAT_TagErrors
     flat: boolean
     params: {
-        strict: boolean
-        title: string
-        message: string
-        targets: []
+        strict?: boolean
+        title?: string
+        message?: string
+        targets?: []
+        with_all_records?: boolean
+        with_all_intances?: boolean
+        with_all_events?: boolean
+
     }
     tag: string,
     field: string,
@@ -97,7 +101,7 @@ class UniqueActionTag {
             case 'start-load':
                 $(this.ob).addClass('loading-unique')
                 $(this.ob).parent().find('.loadingHelp').addClass('is-loading')
-                $(this.ob).prop("disabled", true)
+                //$(this.ob).prop("disabled", true)
                 break;
             
             default:
@@ -108,7 +112,12 @@ class UniqueActionTag {
 
     async ajax_check_unique() {
         try {
-            const response  = await JSO_STPH_UAT.ajax('check-unique', this.data)
+            let payload = [
+                this.data, 
+                this.value
+            ]
+            const response  = await JSO_STPH_UAT.ajax('check-unique', payload)
+            console.log(response)
 
         } catch (error) {
             console.log(error)

@@ -11,6 +11,8 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
     private Array $params;
     private Array $DTO;
 
+    private Object $request;
+
     /**
      * ActionTag Definitions
      * 
@@ -19,29 +21,23 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         "tag" => "@UNIQUE",
         "params" =>  [
             [
-                "name" => "strict",
+                "name" => "with_all_records",
                 "type" => "boolean",
                 "default" => false,
                 "required" => false
             ],
             [
-                "name" => "ignore_instance",
+                "name" => "with_all_instances",
                 "type" => "boolean",
                 "default" => false,
                 "required" => false
             ],
             [
-                "name" => "ignore_event",
+                "name" => "with_all_events",
                 "type" => "boolean",
                 "default" => false,
                 "required" => false
             ],
-            [
-                "name" => "ignore_arm",
-                "type" => "boolean",
-                "default" => false,
-                "required" => false
-            ],  
             [
                 "name" => "targets",
                 "type" => "array",
@@ -76,6 +72,34 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         "allowMultiple" => true,
         "allowStacking" => ["@UNIQUE"]
     ];
+
+    /**
+     * REDCap Hook - AJAX
+     */
+    public function redcap_module_ajax($action, $payload, $project_id, $record, $instrument, $event_id, $repeat_instance, $survey_hash, $response_id, $survey_queue_hash, $page, $page_full, $user_id, $group_id){
+
+        //  Set query parameters per ajax request
+        $this->request = (object)[
+            "project_id" => $project_id,
+            "record" => $record,
+            "instrument" => $instrument,
+            "event_id" => $event_id,
+            "repeat_instance" => $repeat_instance,
+            "survey_hash" => $survey_hash
+        ];
+
+        //  Switch action
+        switch ($action) {
+            case 'check-unique':
+                $response = $this->ajax_check_unique($payload);
+                break;
+            
+            default:               
+                break;
+        }
+
+        return $response;
+    }
 
     /**
      * REDCap Hook - Data Entry Form
@@ -153,6 +177,73 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             src="<?php print $this->getUrl('dist/unique.js'); ?>">
         </script>
         <?php
+    }
+
+    private function ajax_check_unique($payload) {
+        
+        list($tag, $value) = $payload;
+
+        $isUnique = $this->query_unique($tag->field, $tag->params, $value);
+
+        return $isUnique;
+
+        //  we can return something more sophisticated later
+    }
+
+    /**
+     * Query method to check for uniqueness with different parameters
+     * Returns array with duplicate entries: 
+     * $duplicate = array('event_id' => , 'record' => , 'field_name' => , 'instance' => )
+     * 
+     */
+    private function query_unique($field, $params, $value) {
+
+        # Request parameters from ajax hook
+        $request = $this->request;
+
+        # Support multiple redcap_data tables
+        $data_table = method_exists('\REDCap', 'getDataTable') ? \REDCap::getDataTable($request->project_id) : "redcap_data";
+
+        # Build query
+        $query = $this->createQuery();
+
+        # Prepare SQL
+        $sql = "SELECT * FROM ".$data_table." WHERE project_id = ? AND record = ? AND value = ? AND record != ''";
+        $prepared = [$request->project_id, $request->record, $value];
+
+        # Check if something needs to be ignored
+        if ($params->with_event !== true) {
+            $sql .= " AND event_id = ?";
+            $prepared[] = $request->event_id;
+        }
+
+        /**
+         * Only if instrument is repeating
+         * check if we need to ignore instances
+         * 
+         */
+        if ($params->with_instance !== true) {
+            // this has to be an additional check
+            // IFNULL() solves the problem with instance 1 being NULL in the MySQL DB
+            // $sql .= " AND IFNULL(instance, 1) != ?";
+            // $prepared[] = $request->repeat_instance;
+        }
+
+        $query->add($sql, $prepared);
+
+        # Specify targets
+        if(isset($params->targets) && is_array($params->targets) && count($params->targets) > 0) {
+            $targets= array_merge( [$field], $params->targets);
+        } else {
+            $targets = [$field];
+        }
+    
+        $query->add("AND")->addInClause('field_name', $targets);
+
+        $execute = $query->execute();
+        $result = db_result($execute, 0);
+
+        return $this->escape($result);
     }
 
 }
