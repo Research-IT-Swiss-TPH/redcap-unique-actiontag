@@ -116,6 +116,7 @@ class UniqueActionTag {
                 this.data, 
                 this.value
             ]
+            console.log(payload)
             const response  = await JSO_STPH_UAT.ajax('check-unique', payload)
             console.log(response)
 

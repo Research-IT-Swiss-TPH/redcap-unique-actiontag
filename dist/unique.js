@@ -47,7 +47,6 @@ class UniqueActionTag {
             case 'start-load':
                 $(this.ob).addClass('loading-unique');
                 $(this.ob).parent().find('.loadingHelp').addClass('is-loading');
-                $(this.ob).prop("disabled", true);
                 break;
             default:
                 DTO_STPH_UAT.log("Invalid phase.");
@@ -57,7 +56,13 @@ class UniqueActionTag {
     ajax_check_unique() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const response = yield JSO_STPH_UAT.ajax('check-unique', this.data);
+                let payload = [
+                    this.data,
+                    this.value
+                ];
+                console.log(payload);
+                const response = yield JSO_STPH_UAT.ajax('check-unique', payload);
+                console.log(response);
             }
             catch (error) {
                 console.log(error);

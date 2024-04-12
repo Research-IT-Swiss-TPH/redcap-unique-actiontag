@@ -112,7 +112,6 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         $this->renderStyles();
         $this->initializeJavascriptModuleObject();
         $this->renderJavascript($record);
-
     }
 
     private function getModuleParams() {
@@ -181,9 +180,9 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
 
     private function ajax_check_unique($payload) {
         
-        list($tag, $value) = $payload;
+        list($data, $value) = $payload;
 
-        $isUnique = $this->query_unique($tag->field, $tag->params, $value);
+        $isUnique = $this->query_unique($data["field"], (object) $data["params"],$value);
 
         return $isUnique;
 
@@ -198,52 +197,60 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
      */
     private function query_unique($field, $params, $value) {
 
+        $data = [];
+
         # Request parameters from ajax hook
         $request = $this->request;
 
         # Support multiple redcap_data tables
         $data_table = method_exists('\REDCap', 'getDataTable') ? \REDCap::getDataTable($request->project_id) : "redcap_data";
 
-        # Build query
+        # Prepare query
         $query = $this->createQuery();
+      
+        # base query
+        # ignores empty records
+        $sql = "SELECT * FROM ".$data_table." WHERE project_id = ? AND value = ? AND record != ''";
+        $prepared = [$request->project_id, $value];
 
-        # Prepare SQL
-        $sql = "SELECT * FROM ".$data_table." WHERE project_id = ? AND record = ? AND value = ? AND record != ''";
-        $prepared = [$request->project_id, $request->record, $value];
+        # defaults to check all records but current
+        if($params->with_all_records !== true) {
+            $sql .= " AND record != ?";
+            $prepared[] = $request->record;
+        }
 
-        # Check if something needs to be ignored
-        if ($params->with_event !== true) {
+        # defaults to check only current event
+        if ($params->with_all_events !== true) {
             $sql .= " AND event_id = ?";
             $prepared[] = $request->event_id;
         }
 
-        /**
-         * Only if instrument is repeating
-         * check if we need to ignore instances
-         * 
-         */
-        if ($params->with_instance !== true) {
-            // this has to be an additional check
-            // IFNULL() solves the problem with instance 1 being NULL in the MySQL DB
-            // $sql .= " AND IFNULL(instance, 1) != ?";
-            // $prepared[] = $request->repeat_instance;
+        # defaults to check only current instance
+        if ($params->with_all_instances !== true) {
+            $sql .= " AND IFNULL(INSTANCE,1)= ?";
+            $prepared[] = $request->repeat_instance;
+        } else {
+            $sql = " AND IFNULL(instance, 1) != ?";
+            $prepared[] = $request->repeat_instance;
         }
 
         $query->add($sql, $prepared);
 
-        # Specify targets
+        # Specify fields including actual field and targets
         if(isset($params->targets) && is_array($params->targets) && count($params->targets) > 0) {
-            $targets= array_merge( [$field], $params->targets);
+            $fields = array_merge( [$field], $params->targets);
         } else {
-            $targets = [$field];
+            $fields = [$field];
         }
-    
-        $query->add("AND")->addInClause('field_name', $targets);
+        $query->add("AND")->addInClause('field_name', $fields);
 
-        $execute = $query->execute();
-        $result = db_result($execute, 0);
+        $result = $query->execute();
+        
+        while($row = $result->fetch_assoc()) {
+            $data[]= $row;
+        }
 
-        return $this->escape($result);
+        return $this->escape($data);
     }
 
 }
