@@ -182,11 +182,8 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         
         list($data, $value) = $payload;
 
-        $isUnique = $this->query_unique($data["field"], (object) $data["params"],$value);
+        return $this->query_unique($data["field"], (object) $data["params"],$value);
 
-        return $isUnique;
-
-        //  we can return something more sophisticated later
     }
 
     /**
@@ -230,7 +227,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             $sql .= " AND IFNULL(INSTANCE,1)= ?";
             $prepared[] = $request->repeat_instance;
         } else {
-            $sql = " AND IFNULL(instance, 1) != ?";
+            $sql .= " AND IFNULL(instance, 1) != ?";
             $prepared[] = $request->repeat_instance;
         }
 
