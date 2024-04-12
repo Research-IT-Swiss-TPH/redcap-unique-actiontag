@@ -41,12 +41,12 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             [
                 "name" => "targets",
                 "type" => "array",
-                "reqired" => false
+                "required" => false
             ],
             [
                 "name" => "title",
                 "type" => "number",
-                "requried" => false
+                "required" => false
             ],
             [
                 "name" => "message",
@@ -197,7 +197,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
      */
     private function query_unique($field, $params, $value) {
 
-        $data = [];
+        $duplicates = [];
 
         # Request parameters from ajax hook
         $request = $this->request;
@@ -236,7 +236,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
 
         $query->add($sql, $prepared);
 
-        # Specify fields including actual field and targets
+        # Specify all fields to be checked including current field and targets
         if(isset($params->targets) && is_array($params->targets) && count($params->targets) > 0) {
             $fields = array_merge( [$field], $params->targets);
         } else {
@@ -244,13 +244,12 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         }
         $query->add("AND")->addInClause('field_name', $fields);
 
-        $result = $query->execute();
-        
+        $result = $query->execute();        
         while($row = $result->fetch_assoc()) {
-            $data[]= $row;
+            $duplicates[]= $row;
         }
 
-        return $this->escape($data);
+        return $this->escape($duplicates);
     }
 
 }

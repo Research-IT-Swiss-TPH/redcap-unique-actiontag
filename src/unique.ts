@@ -101,12 +101,27 @@ class UniqueActionTag {
             case 'start-load':
                 $(this.ob).addClass('loading-unique')
                 $(this.ob).parent().find('.loadingHelp').addClass('is-loading')
-                //$(this.ob).prop("disabled", true)
-                break;
+                $(this.ob).prop("disabled", true)
+                break
+
+            case 'stop-load':
+                $(this.ob).removeClass('loading-unique')
+                $(this.ob).parent().find('.loadingHelp').removeClass('is-loading')
+                $(this.ob).prop("disabled", false)
+                break
+
+            case 'set-valid':
+                $(this.ob).addClass("is-valid")
+                break
+
+            case 'set-invalid':
+                $(this.ob).addClass("is-invalid")
+                $(this.ob).trigger('select')
+                break
             
             default:
                 DTO_STPH_UAT.log("Invalid phase.")
-                break;
+                break
         }
     }
 
@@ -116,12 +131,23 @@ class UniqueActionTag {
                 this.data, 
                 this.value
             ]
-            console.log(payload)
             const response  = await JSO_STPH_UAT.ajax('check-unique', payload)
-            console.log(response)
-
+            this.process_uniqueness(response)
+        
         } catch (error) {
             console.log(error)
+        }
+    }
+
+    process_uniqueness(duplicates: Object[]) {
+        this.renderUI('stop-load')
+        if(duplicates.length == 0) {
+            console.log("no duplicates")
+            this.renderUI('set-valid')
+        } else {
+            console.log("there are duplicates!")
+            console.log(duplicates)
+            this.renderUI('set-invalid')
         }
     }
 }
