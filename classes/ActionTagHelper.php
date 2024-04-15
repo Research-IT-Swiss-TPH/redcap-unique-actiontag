@@ -222,8 +222,8 @@ class ActionTagHelper
                     'field' => $field["field_name"],
                     'field_type' => $field["field_type"],
                     'flat' => true,
-                    'params' => [],
-                    'errors' => []
+                    'params' => (object) [],
+                    'errors' => (object) []
                 );
             }
         } 
@@ -294,8 +294,8 @@ class ActionTagHelper
                     'field' => $field["field_name"],
                     'field_type' => $field["field_type"],
                     'flat' => false,
-                    'params' => $params,
-                    'errors' => $errors
+                    'params' => (object) $params,
+                    'errors' => (object) $errors
                 );
             }
         }
