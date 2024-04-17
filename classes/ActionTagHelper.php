@@ -186,9 +186,21 @@ class ActionTagHelper
 
         }
 
+        // transform to associative array so that we an loop through in JavaScript
+        $assoc_errors = [];
+        foreach ($errors as $errorName => $error) {
+            foreach ($error as $tag => $fields) {
+                $assoc_errors[] = [
+                    "error_type" => $errorName,
+                    "tag_name" => $tag,
+                    "fields" => $fields
+                ];
+            }
+        }
+
         $this->actionTagData = array(
             $validated,
-            $errors 
+            $assoc_errors 
         );
 
     }

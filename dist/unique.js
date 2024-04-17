@@ -16,7 +16,6 @@ class UniqueActionTag {
     }
     init() {
         this.initiateFields();
-        this.writeTagErrors();
         this.checkOnLoad();
     }
     initiateFields() {
@@ -25,8 +24,6 @@ class UniqueActionTag {
         let divValidFeedback = '<div class="valid-feedback">Field has no duplicates.</div>';
         let divInvalidFeedback = '<div class="invalid-feedback">Field has duplicates.</div>';
         $(this.ob).parent().append(divLoadingHelp + divValidFeedback + divInvalidFeedback);
-    }
-    writeTagErrors() {
     }
     checkOnLoad() {
         if (this.value.length === 0)
@@ -110,11 +107,12 @@ DTO_STPH_UAT.init = function () {
     this.enablePopovers();
 };
 DTO_STPH_UAT.writeTagErrors = function () {
-    if (this.errors.not_allowed_flat.length > 0 || this.errors.not_allowed_multiple.length > 0) {
+    console.log(this.errors);
+    if (this.errors.length > 0) {
         $('#dataEntryTopOptions')
-            .append('<div class="alert alert-warning"><b>Unique Action Tag - External Module</b><br>Errors detected!</div>');
-        Object.keys(this.errors).forEach(error => {
-            console.log(error);
+            .append('<div class="alert alert-warning"><b>Unique Action Tag - External Module</b><br>Errors detected!<br><br><ul id="uat-global-errors"></ul></div>');
+        this.errors.forEach(error => {
+            $('#uat-global-errors').append("<li>In field(s) <b>" + error.fields.join(", ") + "</b> for actiontag <code>" + error.tag_name + "</code> there is an error of type: <b>" + error.error_type + "</b>.</li>");
         });
     }
 };

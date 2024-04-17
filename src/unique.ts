@@ -7,12 +7,18 @@ declare const bootstrap: any
 interface UAT_Module {
     data: Record<string, Record<string, UAT_Tag>>
     params: UAT_Params,
-    errors: Record<string, string[]>
+    errors: UAT_Error[]
     log: Function
     init: Function,
     writeTagErrors: Function,
     writeInstances: Function,
     enablePopovers: Function
+}
+
+interface UAT_Error {
+    error_type: string,
+    tag_name: string,
+    fields: string[]
 }
 
 interface UAT_Tag  {
@@ -57,11 +63,8 @@ class UniqueActionTag {
 
     init(){
         this.initiateFields()
-        this.writeTagErrors()
         this.checkOnLoad()
     }
-
-
 
     initiateFields() {
         this.ob.classList.add('form-control')
@@ -70,11 +73,6 @@ class UniqueActionTag {
         let divInvalidFeedback = '<div class="invalid-feedback">Field has duplicates.</div>'
 
         $(this.ob).parent().append(divLoadingHelp + divValidFeedback + divInvalidFeedback)
-    }
-
-
-    writeTagErrors(){
-        //console.log(this.data.errors)
     }
 
     checkOnLoad() {
@@ -172,16 +170,21 @@ DTO_STPH_UAT.init = function() {
 
 //  Write global errors to log
 DTO_STPH_UAT.writeTagErrors = function() {
-    if( this.errors.not_allowed_flat.length > 0 || this.errors.not_allowed_multiple.length > 0) {
+    console.log(this.errors)
+    if( this.errors.length > 0) {
         $('#dataEntryTopOptions')
-        .append('<div class="alert alert-warning"><b>Unique Action Tag - External Module</b><br>Errors detected!</div>')
-        Object.keys(this.errors).forEach(error => {
-            console.log(error)
+        .append('<div class="alert alert-warning"><b>Unique Action Tag - External Module</b><br>Errors detected!<br><br><ul id="uat-global-errors"></ul></div>')
+
+
+
+        this.errors.forEach( error => {
+            $('#uat-global-errors').append("<li>In field(s) <b>" + error.fields.join(", ") + "</b> for actiontag <code>" + error.tag_name + "</code> there is an error of type: <b>"+ error.error_type +"</b>.</li>")
         });
+
     }
 }
 
-DTO_STPH_UAT.writeInstances =function () {
+DTO_STPH_UAT.writeInstances = function () {
     
     // Loop over all fields and tags, and create a new class for each if has no errors
     Object.keys(this.data).forEach((field)=> {
