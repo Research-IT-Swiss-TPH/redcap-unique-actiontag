@@ -5,13 +5,14 @@ The External Module version 3 has been rewritten from scratch and reduces all Ac
 
 *Warning:* If you are upgrading from version 2 to version 3 there are breaking changes in the way the ActionTag is beeing used. Please ensure you migrate accordingly to the new @UNIQUE API.
 
+## Default behaviour
 The **new** default behaviour of the @UNIQUE Action Tag is:
 
 - check uniqueness against all records except current record
 - check uniqueness against current instance
 - check uniqueness against current event
 
-
+## Usage
 The "with_" flags can be used to enable complete checks against all records , instances or events:
 - check uniqueness against all records inlcuding current record, `with_all_records`:
 
@@ -38,6 +39,7 @@ Additional customizations can be configured with:
 
 `"message": "This is a message."`
 
+## Examples
 
 Example 1: Checks uniqueness across all records except within current record, for the current instance and event.
 
