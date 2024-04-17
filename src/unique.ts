@@ -19,10 +19,9 @@ interface UAT_Tag  {
     errors: UAT_TagErrors
     flat: boolean
     params: {
-        strict?: boolean
         title?: string
         message?: string
-        targets?: []
+        targets?: string[]
         with_all_records?: boolean
         with_all_intances?: boolean
         with_all_events?: boolean
@@ -107,7 +106,7 @@ class UniqueActionTag {
 
             case 'set-invalid':
                 $(this.ob).addClass("is-invalid")
-                $(this.ob).trigger('select')
+                //$(this.ob).trigger('select')
                 break
             
             default:
@@ -164,7 +163,8 @@ DTO_STPH_UAT.log = function() {
 }
 
 DTO_STPH_UAT.init = function() {
-   
+    console.log(DTO_STPH_UAT)
+
     this.writeTagErrors()
     this.writeInstances()
     this.enablePopovers()
@@ -182,6 +182,7 @@ DTO_STPH_UAT.writeTagErrors = function() {
 }
 
 DTO_STPH_UAT.writeInstances =function () {
+    
     // Loop over all fields and tags, and create a new class for each if has no errors
     Object.keys(this.data).forEach((field)=> {
 
@@ -197,19 +198,31 @@ DTO_STPH_UAT.writeInstances =function () {
             if(DTO_STPH_UAT.params.show_labels) {                
                 //  Check if we have any errors on tag level
                 if(Object.keys(data.errors).length !== 0) {
-                    $('#label-'+field+' tr .uat-field-label').append("<p><small>❌ The tag <code>"+tagname+"</code> could not be initiated due to <b>errors</b>.</small></p>")
+                    let errors = '<small>';
+
+                    Object.entries(data.errors).forEach(([key,value]) => {
+                        errors += key + ": <code>" + value + "</code><br>"
+                    })
+
+                    errors += "</small>"
+
+                    let errorsPopover  = '<span tabindex="0" style="text-decoration:underline;"  data-bs-placement="bottom" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-html="true" data-bs-title="Errors for '+tagname+' in '+field+'" data-bs-content="'+errors+'"><small>Errors</small></span>'
+
+                    $('#label-'+field+' tr .uat-field-label').append('<p><small>❌ The tag <code>'+tagname+'</code> could not be initiated. '+errorsPopover+'</small></p>')
                 } else {
-                    let details = 'No details available.'
-                    if(Object.keys(data.params).length > 0) {
+                    let details = "<small>"
+                    details += data.params.with_all_records ? "with_all_records: <code>true</code><br>": "with_all_records: <code>false</code><br>"
+                    details += data.params.with_all_intances ? "with_all_intances: <code>true</code><br>": "with_all_intances: <code>false</code><br>" 
+                    details += data.params.with_all_events ? "with_all_events: <code>true</code><br>": "with_all_events: <code>false</code><br>"
+                    details += data.params.targets ? "targets: <code>" + data.params.targets?.join(", ") + "</code><br>" : "targets: <code>None</code><br>"
+                    details += data.params.title ? "title: <code>"+data.params.title+"</code><br>": "title: <code>none</code><br>"
+                    details += data.params.message ? "message: <code>"+data.params.message+"</code><br>": "message: <code>none</code><br>"
+                    details += "</small>"
 
-                        details = ''
-                        Object.keys(data.params).forEach( param =>{         
-                            details += param ? " " + param : " "
-                        }) 
-                    }
-                    let detailsButton =  '<button class="btn btn-xs btn-secondary" data-bs-placement="bottom" type="button" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-content="'+details+'"><small>?</small></button>'
 
-                    $('#label-'+field+' tr .uat-field-label').append('<p><small>✔️ The tag <code>'+tagname+'</code> is active.<small> '+detailsButton+'</p>')
+                    let detailsPopover = '<span tabindex="0" style="text-decoration:underline;"  data-bs-placement="bottom" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-html="true" data-bs-title="Details for '+tagname+' in '+field+'" data-bs-content="'+details+'"><small>Details</small></span>'
+
+                    $('#label-'+field+' tr .uat-field-label').append('<p><small>✔️ The tag <code>'+tagname+'</code> is active. '+detailsPopover+'</small></p>')
 
                     new UniqueActionTag(data).init()
                 }                
