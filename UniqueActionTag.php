@@ -110,6 +110,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         $this->getModuleData($project_id, $instrument, $record, $event_id, $repeat_instance, NULL);
         $this->getDataTransferObject();
         $this->renderStyles();
+        $this->renderStaticHTML();
         $this->initializeJavascriptModuleObject();
         $this->renderJavascript($record);
     }
@@ -146,11 +147,39 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
     }
 
     private function getDataTransferObject() {
+        $queue = [];
+        $data = [];
+
+        foreach ($this->data as $field => $tags) {
+            foreach ($tags as $tag => $detail) {
+
+                if(!(array)$detail["errors"]) {
+                    $queue[] = array(
+                        "field"=> $field,
+                        "tag" => $tag,
+                        "checked" => false
+                    );
+                }
+
+                $data[] = $detail;
+            }
+        }
+
         $this->DTO = array(
-            "data" => $this->data,
+            "data" => $data,
             "errors" => $this->errors,
-            "params" => $this->params
+            "params" => $this->params  ,
+            "summary" => array(
+                "queue" => $queue,
+                "duplicates" => []
+            )
         );
+
+    }
+    private function renderStaticHTML() {        
+        $path = $this->getUrl('src/unique_modal.html');
+        $html = file_get_contents($path);
+        echo $html;
     }
 
     private function renderStyles() {

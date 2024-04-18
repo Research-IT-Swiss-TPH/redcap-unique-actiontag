@@ -13,10 +13,41 @@ class UniqueActionTag {
         this.data = data;
         this.ob = document.getElementsByName(this.data.field)[0];
         this.value = this.ob.value;
+        this.hasErrors = Object.keys(this.data.errors).length !== 0;
+        this.init();
     }
     init() {
-        this.initiateFields();
-        this.checkOnLoad();
+        this.writeLabels();
+        if (!this.hasErrors) {
+            this.initiateFields();
+            this.checkOnLoad();
+        }
+    }
+    writeLabels() {
+        var _a;
+        if (DTO_STPH_UAT.params.show_labels) {
+            if (this.hasErrors) {
+                let errors = '<small>';
+                Object.entries(this.data.errors).forEach(([key, value]) => {
+                    errors += key + ": <code>" + value + "</code><br>";
+                });
+                errors += "</small>";
+                let errorsPopover = '<span tabindex="0" style="text-decoration:underline;"  data-bs-placement="bottom" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-html="true" data-bs-title="Errors for ' + this.data.tag + ' in ' + this.data.field + '" data-bs-content="' + errors + '"><small>Errors</small></span>';
+                $('#label-' + this.data.field + ' tr .uat-field-label').append('<p><small>❌ The tag <code>' + this.data.tag + '</code> could not be initiated. ' + errorsPopover + '</small></p>');
+            }
+            else {
+                let details = "<small>";
+                details += this.data.params.with_all_records ? "with_all_records: <code>true</code><br>" : "with_all_records: <code>false</code><br>";
+                details += this.data.params.with_all_intances ? "with_all_intances: <code>true</code><br>" : "with_all_intances: <code>false</code><br>";
+                details += this.data.params.with_all_events ? "with_all_events: <code>true</code><br>" : "with_all_events: <code>false</code><br>";
+                details += this.data.params.targets ? "targets: <code>" + ((_a = this.data.params.targets) === null || _a === void 0 ? void 0 : _a.join(", ")) + "</code><br>" : "targets: <code>None</code><br>";
+                details += this.data.params.title ? "title: <code>" + this.data.params.title + "</code><br>" : "title: <code>none</code><br>";
+                details += this.data.params.message ? "message: <code>" + this.data.params.message + "</code><br>" : "message: <code>none</code><br>";
+                details += "</small>";
+                let detailsPopover = '<span tabindex="0" style="text-decoration:underline;"  data-bs-placement="bottom" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-html="true" data-bs-title="Details for ' + this.data.tag + ' in ' + this.data.field + '" data-bs-content="' + details + '"><small>Details</small></span>';
+                $('#label-' + this.data.field + ' tr .uat-field-label').append('<p><small>✔️ The tag <code>' + this.data.tag + '</code> is active. ' + detailsPopover + '</small></p>');
+            }
+        }
     }
     initiateFields() {
         this.ob.classList.add('form-control');
@@ -26,8 +57,6 @@ class UniqueActionTag {
         $(this.ob).parent().append(divLoadingHelp + divValidFeedback + divInvalidFeedback);
     }
     checkOnLoad() {
-        if (this.value.length === 0)
-            return;
         this.renderUI('start-load');
         this.ajax_check_unique();
     }
@@ -57,29 +86,38 @@ class UniqueActionTag {
     ajax_check_unique() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let payload = [
-                    this.data,
-                    this.value
-                ];
+                let payload = [this.data, this.value];
                 const response = yield JSO_STPH_UAT.ajax('check-unique', payload);
-                this.process_uniqueness(response);
+                this.update_summary(response);
             }
             catch (error) {
                 console.log(error);
             }
         });
     }
-    process_uniqueness(duplicates) {
+    update_summary(duplicates) {
+        DTO_STPH_UAT.summary.queue.forEach(el => {
+            if (el.field === this.data.field && el.tag === this.data.tag) {
+                el.checked = true;
+            }
+        });
         this.renderUI('stop-load');
-        if (duplicates.length == 0) {
-            this.renderUI('set-valid');
+        if (duplicates.length > 0) {
+            this.renderUI('set-invalid');
+            duplicates.forEach(duplicate => {
+                DTO_STPH_UAT.summary.duplicates.push(duplicate);
+            });
         }
         else {
-            console.log("Duplicates", duplicates);
-            this.renderUI('set-invalid');
+            this.renderUI('set-valid');
         }
     }
 }
+DTO_STPH_UAT.init = function () {
+    this.writeTagErrors();
+    this.writeInstances();
+    this.enablePopovers();
+};
 DTO_STPH_UAT.log = function () {
     if (!this.params.show_debug)
         return;
@@ -100,14 +138,7 @@ DTO_STPH_UAT.log = function () {
             console.log(arguments);
     }
 };
-DTO_STPH_UAT.init = function () {
-    console.log(DTO_STPH_UAT);
-    this.writeTagErrors();
-    this.writeInstances();
-    this.enablePopovers();
-};
 DTO_STPH_UAT.writeTagErrors = function () {
-    console.log(this.errors);
     if (this.errors.length > 0) {
         $('#dataEntryTopOptions')
             .append('<div class="alert alert-warning"><b>Unique Action Tag - External Module</b><br>Errors detected!<br><br><ul id="uat-global-errors"></ul></div>');
@@ -117,44 +148,27 @@ DTO_STPH_UAT.writeTagErrors = function () {
     }
 };
 DTO_STPH_UAT.writeInstances = function () {
-    Object.keys(this.data).forEach((field) => {
-        if (DTO_STPH_UAT.params.show_labels) {
+    if (DTO_STPH_UAT.params.show_labels) {
+        DTO_STPH_UAT.data.forEach(el => {
             let emlabel = '<p class="uat-field-label" style="font-weight:100;font-size:12px;"><i class="fa-solid fa-cube text-info me-2"></i><small>This field is modified by <b>Unique Action Tag.</b></small></p>';
-            $('#label-' + field + ' tr').find('td:first').append(emlabel);
-        }
-        Object.keys(this.data[field]).forEach((tagname) => {
-            var _a;
-            let data = this.data[field][tagname];
-            if (DTO_STPH_UAT.params.show_labels) {
-                if (Object.keys(data.errors).length !== 0) {
-                    let errors = '<small>';
-                    Object.entries(data.errors).forEach(([key, value]) => {
-                        errors += key + ": <code>" + value + "</code><br>";
-                    });
-                    errors += "</small>";
-                    let errorsPopover = '<span tabindex="0" style="text-decoration:underline;"  data-bs-placement="bottom" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-html="true" data-bs-title="Errors for ' + tagname + ' in ' + field + '" data-bs-content="' + errors + '"><small>Errors</small></span>';
-                    $('#label-' + field + ' tr .uat-field-label').append('<p><small>❌ The tag <code>' + tagname + '</code> could not be initiated. ' + errorsPopover + '</small></p>');
-                }
-                else {
-                    let details = "<small>";
-                    details += data.params.with_all_records ? "with_all_records: <code>true</code><br>" : "with_all_records: <code>false</code><br>";
-                    details += data.params.with_all_intances ? "with_all_intances: <code>true</code><br>" : "with_all_intances: <code>false</code><br>";
-                    details += data.params.with_all_events ? "with_all_events: <code>true</code><br>" : "with_all_events: <code>false</code><br>";
-                    details += data.params.targets ? "targets: <code>" + ((_a = data.params.targets) === null || _a === void 0 ? void 0 : _a.join(", ")) + "</code><br>" : "targets: <code>None</code><br>";
-                    details += data.params.title ? "title: <code>" + data.params.title + "</code><br>" : "title: <code>none</code><br>";
-                    details += data.params.message ? "message: <code>" + data.params.message + "</code><br>" : "message: <code>none</code><br>";
-                    details += "</small>";
-                    let detailsPopover = '<span tabindex="0" style="text-decoration:underline;"  data-bs-placement="bottom" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-html="true" data-bs-title="Details for ' + tagname + ' in ' + field + '" data-bs-content="' + details + '"><small>Details</small></span>';
-                    $('#label-' + field + ' tr .uat-field-label').append('<p><small>✔️ The tag <code>' + tagname + '</code> is active. ' + detailsPopover + '</small></p>');
-                    new UniqueActionTag(data).init();
-                }
-            }
+            $('#label-' + el.field + ' tr').find('td:first').append(emlabel);
         });
+    }
+    this.data.forEach((el) => {
+        new UniqueActionTag(el);
     });
 };
 DTO_STPH_UAT.enablePopovers = function () {
     const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
     const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
+};
+DTO_STPH_UAT.displaySummary = function () {
+    const options = {
+        backdrop: "static"
+    };
+    const uniqueModal = new bootstrap.Modal('#uat-modal', options);
+    console.log(DTO_STPH_UAT.summary.duplicates);
+    uniqueModal.show();
 };
 DTO_STPH_UAT.init();
 export {};
