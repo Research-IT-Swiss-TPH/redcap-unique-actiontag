@@ -167,7 +167,7 @@ class ActionTagHelper
             }
 
             //  check allowMultiple per field
-            if(!$this->actionTags[$tag]["allow_multiple"] && isset($validated[$field][$tag]) && !in_array($field, $errors["not_allowed_multiple"][$tag] ?? [])) {
+            if(!$this->actionTags[$tag]["allowMultiple"] && isset($validated[$field][$tag]) && !in_array($field, $errors["not_allowed_multiple"][$tag] ?? [])) {
                 $errors["not_allowed_multiple"][$tag][] = $field;
 
                 unset($validated[$field][$tag]);
