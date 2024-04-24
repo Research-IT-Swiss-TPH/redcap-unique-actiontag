@@ -211,7 +211,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         
         list($data, $value) = $payload;
 
-        return $this->query_unique($data["field"], (object) $data["params"],$value);
+        return $this->query_unique($data, $value);
 
     }
 
@@ -221,7 +221,11 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
      * $duplicate = array('event_id' => , 'record' => , 'field_name' => , 'instance' => )
      * 
      */
-    private function query_unique($field, $params, $value) {
+    private function query_unique($data, $value) {
+
+        $field = $data["field"];
+        $params = (object) $data["params"];
+        $tag = $data["tag"];
 
         $duplicates = [];
 
@@ -272,6 +276,10 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
 
         $result = $query->execute();        
         while($row = $result->fetch_assoc()) {
+            $row["trigger"] = array(
+                "field" => $field,
+                "tag" => $tag
+            );
             $duplicates[]= $row;
         }
 

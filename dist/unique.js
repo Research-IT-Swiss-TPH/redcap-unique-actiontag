@@ -44,7 +44,7 @@ class UniqueActionTag {
                 details += this.data.params.title ? "title: <code>" + this.data.params.title + "</code><br>" : "title: <code>none</code><br>";
                 details += this.data.params.message ? "message: <code>" + this.data.params.message + "</code><br>" : "message: <code>none</code><br>";
                 details += "</small>";
-                let detailsPopover = '<span tabindex="0" style="text-decoration:underline;"  data-bs-placement="bottom" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-html="true" data-bs-title="Details for ' + this.data.tag + ' in ' + this.data.field + '" data-bs-content="' + details + '"><small>Details</small></span>';
+                let detailsPopover = '<span tabindex="0" style="text-decoration:underline;"  data-bs-placement="bottom" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-html="true" data-bs-title="Details for ' + this.data.tag + ' in ' + this.data.field + '" data-bs-content="' + details + '"><small class="show-actiontag-detail">Details</small></span>';
                 $('#label-' + this.data.field + ' tr .uat-field-label').append('<p><small>✔️ The tag <code>' + this.data.tag + '</code> is active. ' + detailsPopover + '</small></p>');
             }
         }
@@ -53,7 +53,7 @@ class UniqueActionTag {
         this.ob.classList.add('form-control');
         let divLoadingHelp = '<div class="loadingHelp form-text">Checking for duplicates...</div>';
         let divValidFeedback = '<div class="valid-feedback">Field has no duplicates.</div>';
-        let divInvalidFeedback = '<div class="invalid-feedback">Field has duplicates.</div>';
+        let divInvalidFeedback = '<div class="invalid-feedback">Field has duplicates. ';
         $(this.ob).parent().append(divLoadingHelp + divValidFeedback + divInvalidFeedback);
     }
     checkOnLoad() {
@@ -111,6 +111,9 @@ class UniqueActionTag {
         else {
             this.renderUI('set-valid');
         }
+        if (DTO_STPH_UAT.summary.duplicates.length > 0 && DTO_STPH_UAT.summary.queue.every(x => x.checked === true)) {
+            DTO_STPH_UAT.displaySummary();
+        }
     }
 }
 DTO_STPH_UAT.init = function () {
@@ -163,12 +166,51 @@ DTO_STPH_UAT.enablePopovers = function () {
     const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
 };
 DTO_STPH_UAT.displaySummary = function () {
-    const options = {
-        backdrop: "static"
-    };
-    const uniqueModal = new bootstrap.Modal('#uat-modal', options);
+    this.updateModal();
+    this.createModal();
+    this.showModal();
     console.log(DTO_STPH_UAT.summary.duplicates);
-    uniqueModal.show();
+};
+DTO_STPH_UAT.updateModal = function () {
+    $(".modal-body-title").append(`There have been <b>${DTO_STPH_UAT.summary.duplicates.length} duplicates</b> detected:`);
+    DTO_STPH_UAT.summary.duplicates.forEach((duplicate, idx) => {
+        var _a;
+        let accordionItem = `<div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#duplicate-${idx}" aria-expanded="false" aria-controls="#duplicate-${idx}">
+                ${duplicate.trigger.field} : ${duplicate.trigger.tag}
+                </button>
+            </h2>
+            <div id="duplicate-${idx}" class="accordion-collapse collapse" data-bs-parent="#accordionDuplicates">
+            <div class="accordion-body">
+            <ul>
+                <li>Value: ${duplicate.value}</li>
+                <li>Project: ${duplicate.project_id}</li>
+                <li>Event: ${duplicate.event_id}</li>
+                <li>Record: ${duplicate.record}</li>
+                <li>Instance: ${(_a = duplicate.instance) !== null && _a !== void 0 ? _a : "1"}</li>
+            </ul>
+            </div>
+            </div>
+        </div>`;
+        $(accordionItem).appendTo("#uat-modal .modal-body .accordion");
+        const show = '<small onClick="DTO_STPH_UAT.showModal(' + idx + ')" class="show-duplicate-detail">Show</small>';
+        $('input[name="' + duplicate.trigger.field + '"]').parent().find("div.invalid-feedback").append(show);
+    });
+};
+DTO_STPH_UAT.createModal = function () {
+    this.modal = new bootstrap.Modal('#uat-modal', {
+        backdrop: "static"
+    });
+    document.getElementById('uat-modal').addEventListener('hidden.bs.modal', (event) => {
+        $('[data-bs-target*="#duplicate-"]').addClass("collapsed").attr("aria-expanded", "false");
+        $(`[id*=duplicate-]`).removeClass("show");
+    });
+};
+DTO_STPH_UAT.showModal = function (idx = 0) {
+    $(`#duplicate-${idx}`).addClass("show");
+    $(`[data-bs-target="#duplicate-${idx}"]`).removeClass("collapsed").attr("aria-expanded", "true");
+    this.modal.show();
 };
 DTO_STPH_UAT.init();
 export {};
