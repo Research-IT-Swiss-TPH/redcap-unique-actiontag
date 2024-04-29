@@ -21,6 +21,7 @@ class UniqueActionTag {
         if (!this.hasErrors) {
             this.initiateFields();
             this.checkOnLoad();
+            this.addChangeListener();
         }
     }
     writeLabels() {
@@ -32,7 +33,7 @@ class UniqueActionTag {
                     errors += key + ": <code>" + value + "</code><br>";
                 });
                 errors += "</small>";
-                let errorsPopover = '<span tabindex="0" style="text-decoration:underline;"  data-bs-placement="bottom" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-html="true" data-bs-title="Errors for ' + this.data.tag + ' in ' + this.data.field + '" data-bs-content="' + errors + '"><small>Errors</small></span>';
+                let errorsPopover = '<span tabindex="0" style="text-decoration:underline;"  data-bs-placement="bottom" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-html="true" data-bs-title="Errors for ' + this.data.tag + ' in ' + this.data.field + '" data-bs-content="' + errors + '"><small class="show-actiontag-error">Errors</small></span>';
                 $('#label-' + this.data.field + ' tr .uat-field-label').append('<p><small>❌ The tag <code>' + this.data.tag + '</code> could not be initiated. ' + errorsPopover + '</small></p>');
             }
             else {
@@ -60,6 +61,27 @@ class UniqueActionTag {
         this.renderUI('start-load');
         this.ajax_check_unique();
     }
+    checkOnChange(val) {
+        this.renderUI('start-load');
+        this.renderUI('reset');
+        this.value = val;
+        this.ajax_check_unique(false);
+    }
+    addChangeListener() {
+        let that = this;
+        this.ob.addEventListener('input', function (e) {
+            typewatch(() => {
+                that.checkOnChange(this.value);
+            }, 1000);
+        });
+        var typewatch = function () {
+            var timer = 0;
+            return function (callback, ms) {
+                clearTimeout(timer);
+                timer = setTimeout(callback, ms);
+            };
+        }();
+    }
     renderUI(phase) {
         switch (phase) {
             case 'start-load':
@@ -78,17 +100,24 @@ class UniqueActionTag {
             case 'set-invalid':
                 $(this.ob).addClass("is-invalid");
                 break;
+            case 'reset':
+                $(this.ob).removeClass("is-invalid");
+                $(this.ob).removeClass("is-valid");
             default:
                 DTO_STPH_UAT.log("Invalid phase.");
                 break;
         }
     }
     ajax_check_unique() {
-        return __awaiter(this, void 0, void 0, function* () {
+        return __awaiter(this, arguments, void 0, function* (display = true) {
             try {
+                console.log(this.value);
                 let payload = [this.data, this.value];
                 const response = yield JSO_STPH_UAT.ajax('check-unique', payload);
                 this.update_summary(response);
+                if (display && DTO_STPH_UAT.summary.duplicates.length > 0 && DTO_STPH_UAT.summary.queue.every(x => x.checked === true)) {
+                    DTO_STPH_UAT.displaySummary();
+                }
             }
             catch (error) {
                 console.log(error);
@@ -111,9 +140,7 @@ class UniqueActionTag {
         else {
             this.renderUI('set-valid');
         }
-        if (DTO_STPH_UAT.summary.duplicates.length > 0 && DTO_STPH_UAT.summary.queue.every(x => x.checked === true)) {
-            DTO_STPH_UAT.displaySummary();
-        }
+        console.log(DTO_STPH_UAT.summary.duplicates);
     }
 }
 DTO_STPH_UAT.init = function () {

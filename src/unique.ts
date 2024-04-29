@@ -96,6 +96,7 @@ class UniqueActionTag {
         if(!this.hasErrors) {
             this.initiateFields()
             this.checkOnLoad()
+            this.addChangeListener()
         }
     }
 
@@ -112,7 +113,7 @@ class UniqueActionTag {
                 })
                 errors += "</small>"
 
-                let errorsPopover  = '<span tabindex="0" style="text-decoration:underline;"  data-bs-placement="bottom" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-html="true" data-bs-title="Errors for '+this.data.tag+' in '+this.data.field+'" data-bs-content="'+errors+'"><small>Errors</small></span>'
+                let errorsPopover  = '<span tabindex="0" style="text-decoration:underline;"  data-bs-placement="bottom" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-html="true" data-bs-title="Errors for '+this.data.tag+' in '+this.data.field+'" data-bs-content="'+errors+'"><small class="show-actiontag-error">Errors</small></span>'
 
                 $('#label-'+this.data.field+' tr .uat-field-label').append('<p><small>❌ The tag <code>'+this.data.tag+'</code> could not be initiated. '+errorsPopover+'</small></p>')
             } else {
@@ -147,6 +148,39 @@ class UniqueActionTag {
         this.ajax_check_unique()
     }
 
+    checkOnChange(val:string) {
+
+        this.renderUI('start-load')
+        this.renderUI('reset')
+                
+        this.value = val
+        this.ajax_check_unique(false)
+
+    }
+
+    addChangeListener() {
+        let that = this
+        this.ob.addEventListener('input', function(e:Event){                 
+            typewatch(()=> {        
+                that.checkOnChange(this.value)    
+            }, 1000)            
+        })
+
+        /**
+         * Typewatcher so that we do not spam the database
+         * on each change.
+         * https://stackoverflow.com/a/1047278/3127170
+         *  
+         */  
+        var typewatch = function(){
+            var timer = 0;
+            return function(callback:Function, ms:number){
+                clearTimeout (timer);
+                timer = setTimeout(callback, ms);
+            }  
+        }();
+    }
+
     renderUI(phase: String) {
         switch(phase) {
 
@@ -170,6 +204,10 @@ class UniqueActionTag {
                 $(this.ob).addClass("is-invalid")
                 //$(this.ob).trigger('select')
                 break
+
+            case 'reset':
+                $(this.ob).removeClass("is-invalid")
+                $(this.ob).removeClass("is-valid")
             
             default:
                 DTO_STPH_UAT.log("Invalid phase.")
@@ -177,13 +215,18 @@ class UniqueActionTag {
         }
     }
 
-    async ajax_check_unique() {
+    async ajax_check_unique(display:boolean=true) {
 
         try {
+            console.log(this.value)
             let payload = [this.data, this.value]
             const response  = await JSO_STPH_UAT.ajax('check-unique', payload)
 
             this.update_summary(response);
+
+            if( display && DTO_STPH_UAT.summary.duplicates.length > 0 && DTO_STPH_UAT.summary.queue.every(x => x.checked === true) ) {
+                DTO_STPH_UAT.displaySummary()
+            }
         
         } catch (error) {
             console.log(error)
@@ -192,7 +235,7 @@ class UniqueActionTag {
 
     update_summary(duplicates: UAT_Duplicate[]) {
 
-
+        //  track checked state for each field
         DTO_STPH_UAT.summary.queue.forEach(el => {
             if(el.field === this.data.field && el.tag === this.data.tag) {
                 el.checked = true
@@ -209,11 +252,8 @@ class UniqueActionTag {
         } else {
             this.renderUI('set-valid')
         }
-
-        if( DTO_STPH_UAT.summary.duplicates.length > 0 && DTO_STPH_UAT.summary.queue.every(x => x.checked === true) ) {
-            DTO_STPH_UAT.displaySummary()
-        }
-
+        
+        console.log(DTO_STPH_UAT.summary.duplicates)
     }
 }
 

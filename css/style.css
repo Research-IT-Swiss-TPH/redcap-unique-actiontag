@@ -19,7 +19,7 @@
     text-decoration: underline;
 }
 
-.show-duplicate-detail:hover, .show-actiontag-detail:hover {
+.show-duplicate-detail:hover, .show-actiontag-detail:hover,  .show-actiontag-error:hover{
     cursor: pointer;
     font-weight: bold;
 }
