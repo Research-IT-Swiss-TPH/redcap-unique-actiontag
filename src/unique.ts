@@ -59,7 +59,8 @@ interface UAT_Params {
     show_debug: boolean,
     show_erors: boolean,
     show_labels: boolean,
-    enable_hard_check: boolean
+    enable_hard_check: boolean,
+    disable_summary: boolean
 }
 
 
@@ -163,7 +164,7 @@ class UniqueActionTag {
         this.ob.addEventListener('input', function(e:Event){                 
             typewatch(()=> {        
                 that.checkOnChange(this.value)    
-            }, 1000)            
+            }, 750)            
         })
 
         /**
@@ -224,7 +225,7 @@ class UniqueActionTag {
 
             this.update_summary(response);
 
-            if( display && DTO_STPH_UAT.summary.duplicates.length > 0 && DTO_STPH_UAT.summary.queue.every(x => x.checked === true) ) {
+            if( display && !DTO_STPH_UAT.params.disable_summary && DTO_STPH_UAT.summary.duplicates.length > 0 && DTO_STPH_UAT.summary.queue.every(x => x.checked === true) ) {
                 DTO_STPH_UAT.displaySummary()
             }
         

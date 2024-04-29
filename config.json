@@ -31,8 +31,13 @@
          },
          {
              "key": "enable-hard-check",
-             "name": "Enable Hard Check<br>Disable Save Buttons if there are violations of uniqueness within a record's data entry page.",
+             "name": "Enable Hard Check<br>Disable Save Buttons if there are violations of uniqueness within a record's data entry page",
              "type": "checkbox"
+         },
+         {
+            "key": "disable-summary",
+            "name": "Disable showing summary on initial record page load",
+            "type": "checkbox"
          }
      ],
      "action-tags":

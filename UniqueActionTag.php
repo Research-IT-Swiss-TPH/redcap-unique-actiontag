@@ -129,7 +129,8 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
             "show_debug"  => (bool) $this->getProjectSetting("javascript-debug") === true,
             "show_errors" => (bool) $this->getProjectSetting("show-errors") === true,
             "show_labels" => (bool) $this->getProjectSetting("show-labels") === true,
-            "hard_check"  => (bool) $this->getProjectSetting("enable-hard-check") === true
+            "enable_hard_check"  => (bool) $this->getProjectSetting("enable-hard-check") === true,
+            "disable_summary"  => (bool) $this->getProjectSetting("disable-summary") === true
         ];
 
     }

@@ -72,7 +72,7 @@ class UniqueActionTag {
         this.ob.addEventListener('input', function (e) {
             typewatch(() => {
                 that.checkOnChange(this.value);
-            }, 1000);
+            }, 750);
         });
         var typewatch = function () {
             var timer = 0;
@@ -115,7 +115,7 @@ class UniqueActionTag {
                 let payload = [this.data, this.value];
                 const response = yield JSO_STPH_UAT.ajax('check-unique', payload);
                 this.update_summary(response);
-                if (display && DTO_STPH_UAT.summary.duplicates.length > 0 && DTO_STPH_UAT.summary.queue.every(x => x.checked === true)) {
+                if (display && !DTO_STPH_UAT.params.disable_summary && DTO_STPH_UAT.summary.duplicates.length > 0 && DTO_STPH_UAT.summary.queue.every(x => x.checked === true)) {
                     DTO_STPH_UAT.displaySummary();
                 }
             }
