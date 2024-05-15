@@ -140,10 +140,9 @@ class ActionTagHelperTest extends BaseTest {
 
         $actualData = $actionTagHelper->getData();
       
-        $json = file_get_contents(__DIR__ . '/data/expected_data.json');
-        $expectedData = json_decode($json, true);
+        $expectedActionTags = self::loadFixture('action-tags');
 
-        $this->assertEquals($expectedData, $actualData);
+        $this->assertEquals($expectedActionTags, $actualData);
     }
 
 }

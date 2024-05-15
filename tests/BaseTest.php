@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../../../redcap_connect.php';
 if (!class_exists("ActionTagHelper")) include_once("classes/ActionTagHelper.php");
 
+use Exception;
 use \ExternalModules\ExternalModules;
 use \ExternalModules\ModuleBaseTest;
 
@@ -28,7 +29,7 @@ abstract class BaseTest extends ModuleBaseTest {
      */
     static function setUpBeforeClass(): void
     {
-        self::resetTestProjects();
+        //self::resetTestProjects();
         self::$testPIDs = ExternalModules::getTestPIDs();
         self::$TEST_PID_1 = self::$testPIDs[0];
         self::$TEST_PID_2 = self::$testPIDs[1];
@@ -139,6 +140,20 @@ abstract class BaseTest extends ModuleBaseTest {
             // start the output buffer again
             ob_start();
         }
+    }
+
+    /**
+     * Loads a test fixture from json into an associative array
+     */
+    protected static function loadFixture($file)
+    {
+        $fixture_path = __DIR__."/fixtures/{$file}.json";
+
+        if(!file_exists($fixture_path)) {
+            throw new Exception("Fixture at path $fixture_path does not exist.");
+        }
+
+        return json_decode(file_get_contents($fixture_path), true);
     }
 
 
