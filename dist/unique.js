@@ -103,6 +103,7 @@ class UniqueActionTag {
             case 'reset':
                 $(this.ob).removeClass("is-invalid");
                 $(this.ob).removeClass("is-valid");
+                break;
             default:
                 DTO_STPH_UAT.log("Invalid phase.");
                 break;
@@ -110,26 +111,46 @@ class UniqueActionTag {
     }
     ajax_check_unique() {
         return __awaiter(this, arguments, void 0, function* (display = true) {
-            try {
-                console.log(this.value);
-                let payload = [this.data, this.value];
-                const response = yield JSO_STPH_UAT.ajax('check-unique', payload);
-                this.update_summary(response);
-                if (display && !DTO_STPH_UAT.params.disable_summary && DTO_STPH_UAT.summary.duplicates.length > 0 && DTO_STPH_UAT.summary.queue.every(x => x.checked === true)) {
-                    DTO_STPH_UAT.displaySummary();
+            if (this.value !== "") {
+                try {
+                    let payload = [this.data, this.value];
+                    const response = yield JSO_STPH_UAT.ajax('check-unique', payload);
+                    this.update_summary(response, this.data.field, this.data.tag);
+                    console.log("Queue", DTO_STPH_UAT.summary.queue);
+                    if (DTO_STPH_UAT.summary.queue.every(x => x.checked === true)) {
+                        DTO_STPH_UAT.resetModal();
+                        DTO_STPH_UAT.updateModal();
+                        if (display && !DTO_STPH_UAT.params.disable_summary) {
+                            DTO_STPH_UAT.showModal();
+                        }
+                        if (DTO_STPH_UAT.params.enable_hard_check) {
+                            DTO_STPH_UAT.toggleSaveButtons();
+                        }
+                    }
+                }
+                catch (error) {
+                    console.log(error);
                 }
             }
-            catch (error) {
-                console.log(error);
+            else {
+                DTO_STPH_UAT.summary.queue.forEach(el => {
+                    if (el.field === this.data.field && el.tag === this.data.tag) {
+                        el.checked = true;
+                    }
+                });
+                this.renderUI('stop-load');
             }
+            this.ob.focus();
         });
     }
-    update_summary(duplicates) {
+    update_summary(duplicates, field, tag) {
         DTO_STPH_UAT.summary.queue.forEach(el => {
             if (el.field === this.data.field && el.tag === this.data.tag) {
                 el.checked = true;
             }
         });
+        let filteredDuplicates = DTO_STPH_UAT.summary.duplicates.filter(function (duplicate) { return duplicate.trigger.field != field; });
+        DTO_STPH_UAT.summary.duplicates = filteredDuplicates;
         this.renderUI('stop-load');
         if (duplicates.length > 0) {
             this.renderUI('set-invalid');
@@ -140,13 +161,14 @@ class UniqueActionTag {
         else {
             this.renderUI('set-valid');
         }
-        console.log(DTO_STPH_UAT.summary.duplicates);
+        console.log("Duplicatesx", DTO_STPH_UAT.summary.duplicates);
     }
 }
 DTO_STPH_UAT.init = function () {
     this.writeTagErrors();
     this.writeInstances();
     this.enablePopovers();
+    this.createModal();
 };
 DTO_STPH_UAT.log = function () {
     if (!this.params.show_debug)
@@ -192,11 +214,32 @@ DTO_STPH_UAT.enablePopovers = function () {
     const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
     const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
 };
-DTO_STPH_UAT.displaySummary = function () {
-    this.updateModal();
-    this.createModal();
-    this.showModal();
-    console.log(DTO_STPH_UAT.summary.duplicates);
+DTO_STPH_UAT.toggleSaveButtons = function () {
+    let disabled = true;
+    if (DTO_STPH_UAT.summary.duplicates.length > 0) {
+        $('#formSaveTip').hide();
+    }
+    else {
+        $('#formSaveTip').show();
+        disabled = false;
+    }
+    $('button[name="submit-btn-savecontinue"]').prop("disabled", disabled);
+    $('#submit-btn-dropdown').prop("disabled", disabled);
+    $('button[name="submit-btn-saverecord"]').prop("disabled", disabled);
+};
+DTO_STPH_UAT.createModal = function () {
+    this.modal = new bootstrap.Modal('#uat-modal', {
+        backdrop: "static"
+    });
+    document.getElementById('uat-modal').addEventListener('hidden.bs.modal', (event) => {
+        $('[data-bs-target*="#duplicate-"]').addClass("collapsed").attr("aria-expanded", "false");
+        $(`[id*=duplicate-]`).removeClass("show");
+    });
+};
+DTO_STPH_UAT.resetModal = function () {
+    $(".modal-body-title").empty();
+    $("#accordionDuplicates").empty();
+    $(".show-duplicate-detail").remove();
 };
 DTO_STPH_UAT.updateModal = function () {
     $(".modal-body-title").append(`There have been <b>${DTO_STPH_UAT.summary.duplicates.length} duplicates</b> detected:`);
@@ -221,17 +264,9 @@ DTO_STPH_UAT.updateModal = function () {
             </div>
         </div>`;
         $(accordionItem).appendTo("#uat-modal .modal-body .accordion");
+        console.log("Ok");
         const show = '<small onClick="DTO_STPH_UAT.showModal(' + idx + ')" class="show-duplicate-detail">Show</small>';
         $('input[name="' + duplicate.trigger.field + '"]').parent().find("div.invalid-feedback").append(show);
-    });
-};
-DTO_STPH_UAT.createModal = function () {
-    this.modal = new bootstrap.Modal('#uat-modal', {
-        backdrop: "static"
-    });
-    document.getElementById('uat-modal').addEventListener('hidden.bs.modal', (event) => {
-        $('[data-bs-target*="#duplicate-"]').addClass("collapsed").attr("aria-expanded", "false");
-        $(`[id*=duplicate-]`).removeClass("show");
     });
 };
 DTO_STPH_UAT.showModal = function (idx = 0) {

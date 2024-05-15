@@ -245,10 +245,8 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         $prepared = [$request->project_id, $value];
 
         # defaults to check all records but current
-        if($params->with_all_records !== true) {
-            $sql .= " AND record != ?";
-            $prepared[] = $request->record;
-        }
+        $sql .= " AND record != ?";
+        $prepared[] = $request->record;
 
         # defaults to check only current event
         if ($params->with_all_events !== true) {
@@ -273,6 +271,7 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
         } else {
             $fields = [$field];
         }
+
         $query->add("AND")->addInClause('field_name', $fields);
 
         $result = $query->execute();        
@@ -282,6 +281,30 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
                 "tag" => $tag
             );
             $duplicates[]= $row;
+        }
+
+        //  Additional query within record if we have all records and params set
+        if($params->with_all_records == true && isset($params->targets) && is_array($params->targets) && count($params->targets) > 0) {
+            $duplicates_war= [];
+
+            $sql_war = "SELECT * FROM ".$data_table." WHERE project_id = ? AND value = ? AND record = ?";
+            $prepared_war = [$request->project_id, $value, $request->record];
+            
+            $query_war = $this->createQuery();
+            $query_war->add($sql_war, $prepared_war);
+            $query_war->add("AND")->addInClause("field_name", $params->targets);
+
+
+            $result_war = $query_war->execute();  
+            while($row = $result_war->fetch_assoc()) {
+                $row["trigger"] = array(
+                    "field" => $field,
+                    "tag" => $tag
+                );
+                $duplicates_war[]= $row;
+            }
+
+            $duplicates = array_merge($duplicates, $duplicates_war);
         }
 
         return $this->escape($duplicates);

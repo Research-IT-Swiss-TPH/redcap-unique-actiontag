@@ -14,17 +14,17 @@ interface UAT_Module {
         duplicates: UAT_Duplicate[],
         queue: { field:string, tag:string, checked: boolean }[]
     }
-    
     log: Function,
     init: Function,
     writeTagErrors: Function,
     writeInstances: Function,
     enablePopovers: Function,
     modal: bootstrap.Modal,
+    resetModal: Function,
     updateModal: Function,
     showModal: Function,
     createModal: Function,
-    displaySummary: Function
+    toggleSaveButtons: Function
 }
 
 interface UAT_Error {
@@ -150,25 +150,22 @@ class UniqueActionTag {
     }
 
     checkOnChange(val:string) {
-
         this.renderUI('start-load')
         this.renderUI('reset')
-                
         this.value = val
         this.ajax_check_unique(false)
-
     }
 
     addChangeListener() {
         let that = this
         this.ob.addEventListener('input', function(e:Event){                 
             typewatch(()=> {        
-                that.checkOnChange(this.value)    
+                that.checkOnChange(this.value)
             }, 750)            
         })
 
         /**
-         * Typewatcher so that we do not spam the database
+         * Use a Typewatcher so that we do not spam the database
          * on each change.
          * https://stackoverflow.com/a/1047278/3127170
          *  
@@ -203,12 +200,12 @@ class UniqueActionTag {
 
             case 'set-invalid':
                 $(this.ob).addClass("is-invalid")
-                //$(this.ob).trigger('select')
                 break
 
             case 'reset':
                 $(this.ob).removeClass("is-invalid")
                 $(this.ob).removeClass("is-valid")
+                break
             
             default:
                 DTO_STPH_UAT.log("Invalid phase.")
@@ -218,23 +215,50 @@ class UniqueActionTag {
 
     async ajax_check_unique(display:boolean=true) {
 
-        try {
-            console.log(this.value)
-            let payload = [this.data, this.value]
-            const response  = await JSO_STPH_UAT.ajax('check-unique', payload)
+        if(this.value !== "") {
 
-            this.update_summary(response);
+            try {
+                let payload = [this.data, this.value]
+                const response  = await JSO_STPH_UAT.ajax('check-unique', payload)
+    
+                //  remove field from summary
+                this.update_summary(response, this.data.field, this.data.tag);
 
-            if( display && !DTO_STPH_UAT.params.disable_summary && DTO_STPH_UAT.summary.duplicates.length > 0 && DTO_STPH_UAT.summary.queue.every(x => x.checked === true) ) {
-                DTO_STPH_UAT.displaySummary()
+                //console.log("Queue", DTO_STPH_UAT.summary.queue)
+    
+                //  Detect last run
+                if(DTO_STPH_UAT.summary.queue.every(x => x.checked === true)) {     
+    
+                    DTO_STPH_UAT.resetModal()
+                    DTO_STPH_UAT.updateModal()
+    
+                    if(display && !DTO_STPH_UAT.params.disable_summary) {
+                        DTO_STPH_UAT.showModal()
+                    }
+    
+                    if(DTO_STPH_UAT.params.enable_hard_check) {
+                        DTO_STPH_UAT.toggleSaveButtons()
+                    }
+                }
+    
+            } catch (error) {
+                console.log(error)
             }
-        
-        } catch (error) {
-            console.log(error)
+        } else {
+             //  track checked state for each field
+            DTO_STPH_UAT.summary.queue.forEach(el => {
+                if(el.field === this.data.field && el.tag === this.data.tag) {
+                    el.checked = true
+                }
+            })
+
+            this.renderUI('stop-load')
         }
+        this.ob.focus()
+
     }
 
-    update_summary(duplicates: UAT_Duplicate[]) {
+    update_summary(duplicates: UAT_Duplicate[], field:string, tag:string) {
 
         //  track checked state for each field
         DTO_STPH_UAT.summary.queue.forEach(el => {
@@ -243,8 +267,13 @@ class UniqueActionTag {
             }
         })
 
+        //  Reset duplicates summary for this item
+        let filteredDuplicates = DTO_STPH_UAT.summary.duplicates.filter(function(duplicate){ return duplicate.trigger.field != field})
+        DTO_STPH_UAT.summary.duplicates = filteredDuplicates        
+
         this.renderUI('stop-load')
 
+        //  Add duplicate to duplicates summary if we have any
         if(duplicates.length > 0) {
             this.renderUI('set-invalid')
             duplicates.forEach(duplicate => {
@@ -254,7 +283,7 @@ class UniqueActionTag {
             this.renderUI('set-valid')
         }
         
-        console.log(DTO_STPH_UAT.summary.duplicates)
+        //console.log("Duplicatesx", DTO_STPH_UAT.summary.duplicates)
     }
 }
 
@@ -267,6 +296,7 @@ DTO_STPH_UAT.init = function() {
     this.writeTagErrors()
     this.writeInstances()
     this.enablePopovers()
+    this.createModal()
 }
 
 
@@ -330,14 +360,43 @@ DTO_STPH_UAT.enablePopovers = function() {
     const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
 }
 
-DTO_STPH_UAT.displaySummary = function () {
 
-    this.updateModal()
-    this.createModal()
-    this.showModal()
+DTO_STPH_UAT.toggleSaveButtons = function() {
 
-    console.log(DTO_STPH_UAT.summary.duplicates)
+    let disabled = true
 
+    if(DTO_STPH_UAT.summary.duplicates.length > 0) {
+        $('#formSaveTip').hide()
+
+    } else {
+        $('#formSaveTip').show()
+        disabled = false
+    }
+
+    $('button[name="submit-btn-savecontinue"]').prop("disabled", disabled)
+    $('#submit-btn-dropdown').prop("disabled", disabled)
+    $('button[name="submit-btn-saverecord"]').prop("disabled", disabled)
+
+}
+
+
+DTO_STPH_UAT.createModal = function() {
+
+    this.modal = new bootstrap.Modal('#uat-modal', {
+        backdrop: "static"
+    })
+
+    //  things break if we use jquery here, that's why we stay vanilla
+    document.getElementById('uat-modal')!.addEventListener('hidden.bs.modal', (event:Event) => {
+        $('[data-bs-target*="#duplicate-"]').addClass("collapsed").attr("aria-expanded","false")
+        $(`[id*=duplicate-]`).removeClass("show")
+    })
+}
+
+DTO_STPH_UAT.resetModal = function(){    
+    $(".modal-body-title").empty()
+    $("#accordionDuplicates").empty()
+    $(".show-duplicate-detail").remove()
 }
 
 DTO_STPH_UAT.updateModal = function() {
@@ -371,19 +430,6 @@ DTO_STPH_UAT.updateModal = function() {
 
     })
 
-}
-
-DTO_STPH_UAT.createModal = function() {
-
-    this.modal = new bootstrap.Modal('#uat-modal', {
-        backdrop: "static"
-    })
-
-    //  breaks things if we use jquery here, that's why we stay vanilla
-    document.getElementById('uat-modal')!.addEventListener('hidden.bs.modal', (event:Event) => {
-        $('[data-bs-target*="#duplicate-"]').addClass("collapsed").attr("aria-expanded","false")
-        $(`[id*=duplicate-]`).removeClass("show")
-    })
 }
 
 DTO_STPH_UAT.showModal = function(idx:number=0) {
