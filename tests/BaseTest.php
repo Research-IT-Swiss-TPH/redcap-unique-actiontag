@@ -6,6 +6,8 @@ if (!class_exists("ActionTagHelper")) include_once("classes/ActionTagHelper.php"
 use Exception;
 use \ExternalModules\ExternalModules;
 use \ExternalModules\ModuleBaseTest;
+use Project;
+use Vanderbilt\REDCap\Classes\ProjectDesigner;
 
 abstract class BaseTest extends ModuleBaseTest {
 
@@ -157,4 +159,21 @@ abstract class BaseTest extends ModuleBaseTest {
     }
 
 
+    protected static function addField($projectId, $formName, $fieldLabel, $fieldName, $fieldType) {
+
+        $fieldParams = array(
+            "field_label"   => $fieldLabel,
+            "field_name"    => $fieldName,
+            "field_type"    => $fieldType
+        );
+
+        $project = new Project($projectId);
+        $projectDesigner = new ProjectDesigner($project);
+
+        $projectDesigner->createField($formName, $fieldParams);
+    }
+
+    protected static function makeFormRepeatable($projectId, $formName, $eventId) {
+        
+    }
 }
