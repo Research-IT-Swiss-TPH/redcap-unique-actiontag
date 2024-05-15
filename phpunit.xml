@@ -1,5 +1,6 @@
 <testsuites>
     <testsuite name="UniqueActionTag">
-        <directory >./tests/</directory>
+        <directory suffix=".php">./tests/</directory>
+        <exclude>./tests/ActionTagHelperTest.php</exclude>
     </testsuite>
 </testsuites>

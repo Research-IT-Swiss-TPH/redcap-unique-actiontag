@@ -5,5 +5,8 @@
     },
     "autoload-dev": {
         "psr-4": { "STPH\\UniqueActionTag\\": "tests/" }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit --colors --testdox"
     }
 }
