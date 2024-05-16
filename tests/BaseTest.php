@@ -11,7 +11,11 @@ use Vanderbilt\REDCap\Classes\ProjectDesigner;
 
 abstract class BaseTest extends ModuleBaseTest {
 
-    public String $rndm;
+    const AJAX_ACTION = "check-unique";
+    const FORM_1_NAME = "form_1";
+    const FORM_2_NAME = "form_2";
+
+    public static $rndm;
     public static $testPIDs;
 
     public static $TEST_PID_1;
@@ -31,7 +35,7 @@ abstract class BaseTest extends ModuleBaseTest {
      */
     static function setUpBeforeClass(): void
     {
-        //self::resetTestProjects();
+        self::resetTestProjects();
         self::$testPIDs = ExternalModules::getTestPIDs();
         self::$TEST_PID_1 = self::$testPIDs[0];
         self::$TEST_PID_2 = self::$testPIDs[1];
@@ -52,6 +56,7 @@ abstract class BaseTest extends ModuleBaseTest {
      * 
      */
     static function tearDownAfterClass():void{
+
         // self::echo("\nFinishing tests.\n");
         // self::echo("---\n\n");
     }
@@ -109,7 +114,11 @@ abstract class BaseTest extends ModuleBaseTest {
 
         self::echo("Projects table has been preserved.\n");
 
-    }    
+    }
+
+    protected static function getRndm() {
+        return (string) substr(hash('sha256', rand()), 0, 10);
+    }
 
     /**
      * Writes into console
@@ -158,7 +167,48 @@ abstract class BaseTest extends ModuleBaseTest {
         return json_decode(file_get_contents($fixture_path), true);
     }
 
+    /**
+     * REDCap Module Ajax Hook Call
+     * 
+     */
+    function mock_module_ajax($project_id, $record, $repeat_instance, $payload) {
 
+        $action = self::AJAX_ACTION;
+        $event_id = $this->getFirstEventId($project_id);
+        $instrument = self::FORM_1_NAME;
+
+        $survey_hash = null;
+        $response_id = null;
+        $survey_queue_hash = null;
+        $page = null;
+        $page_full =  null;
+        $user_id = null;
+        $group_id = null;
+
+        $args = [
+            $action, 
+            $payload, 
+            $project_id, 
+            $record, 
+            $instrument, 
+            $event_id, 
+            $repeat_instance, 
+            $survey_hash, 
+            $response_id, 
+            $survey_queue_hash, 
+            $page, 
+            $page_full, 
+            $user_id, 
+            $group_id
+        ];
+
+        $this->redcap_module_ajax(...$args);
+
+    }
+
+    /**
+     * Fixture Helpers
+     */
     protected static function addField($projectId, $formName, $fieldLabel, $fieldName, $fieldType) {
 
         $fieldParams = array(
@@ -176,4 +226,15 @@ abstract class BaseTest extends ModuleBaseTest {
     protected static function makeFormRepeatable($projectId, $formName, $eventId) {
         
     }
+
+    /**
+     * Helper function to generate form_name from form_label
+     * Taken from ProjectDesigner Class (it would be good if REDCap Core offers this as a default)
+     * 
+     */
+    protected static function getFormName($form_label) {
+        return preg_replace("/[^a-z_0-9]/", "", str_replace(" ", "_", strtolower($form_label)));
+    }
+
+
 }

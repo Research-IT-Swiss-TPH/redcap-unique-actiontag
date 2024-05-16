@@ -1,5 +1,7 @@
 <?php namespace STPH\UniqueActionTag;
 
+use Exception;
+
 if (file_exists("vendor/autoload.php")) {
     require 'vendor/autoload.php';
 }
@@ -209,6 +211,10 @@ class UniqueActionTag extends \ExternalModules\AbstractExternalModule {
     }
 
     private function ajax_check_unique($payload) {
+
+        if(empty($payload)) {
+            throw new Exception("Payload must be not empty.");
+        }
         
         list($data, $value) = $payload;
 

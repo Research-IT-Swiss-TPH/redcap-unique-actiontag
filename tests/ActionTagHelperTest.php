@@ -6,7 +6,6 @@ require_once __DIR__ . '/../../../redcap_connect.php';
 use Exception;
 use Project;
 use Vanderbilt\REDCap\Classes\ProjectDesigner;
-use \ExternalModules\ExternalModules;
 
 class ActionTagHelperTest extends BaseTest {
 
@@ -90,14 +89,14 @@ class ActionTagHelperTest extends BaseTest {
         "allowMultiple" => false,
     ];
 
-    /**
-     * Helper function to generate form_name from form_label
-     * Taken from ProjectDesigner Class (it would be good if REDCap Core offers this as a default)
-     * 
-     */
-    private function getFormName($form_label) {
-        return preg_replace("/[^a-z_0-9]/", "", str_replace(" ", "_", strtolower($form_label)));
-    }
+    // /**
+    //  * Helper function to generate form_name from form_label
+    //  * Taken from ProjectDesigner Class (it would be good if REDCap Core offers this as a default)
+    //  * 
+    //  */
+    // private function getFormName($form_label) {
+    //     return preg_replace("/[^a-z_0-9]/", "", str_replace(" ", "_", strtolower($form_label)));
+    // }
 
     /**
      * Test Define ActionTags
@@ -118,7 +117,7 @@ class ActionTagHelperTest extends BaseTest {
      */
     function test_getdata_actiontag() {
 
-        $form_label = "Form " . $this->rndm;
+        $form_label = "Form " . self::getRndm();
 
         $project_id = self::$TEST_PID_1;
         $Proj = new Project($project_id);
@@ -128,7 +127,7 @@ class ActionTagHelperTest extends BaseTest {
         $created = $projectDesigner->createForm( $form_label, "form_1");
         if(!$created) throw new Exception("Could not create form");
 
-        // Create fields
+        //  Create fields
         $form_name = $this->getFormName($form_label);
         foreach (self::FIELD_PARAMS as $key => $fieldParam) {
             $projectDesigner->createField($form_name, $fieldParam);

@@ -2,5 +2,6 @@
     <testsuite name="UniqueActionTag">
         <directory suffix=".php">./tests/</directory>
         <exclude>./tests/ActionTagHelperTest.php</exclude>
+        <exclude>./tests/CheckUniqueRepeatingTest.php</exclude>
     </testsuite>
 </testsuites>
